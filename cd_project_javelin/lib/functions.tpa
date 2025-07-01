@@ -1,0 +1,76 @@
+/////                                                  \\\\\
+///// existing libraries                               \\\\\
+/////                                                  \\\\\
+
+INCLUDE ~cd_project_javelin/lib/game_checks.tpa~       // sets various game_is vars
+INCLUDE ~cd_project_javelin/lib/alter_header.tpa~      // used to modify headers
+INCLUDE ~cd_project_javelin/lib/g3_cpmvars_master.tpa~ // CPM for bg content
+INCLUDE ~cd_project_javelin/lib/cd_transfer_profs.tpa~ // prof comp for new weapons on creatures
+
+/////                                                  \\\\\
+///// the javelin assembly line                        \\\\\
+/////                                                  \\\\\
+
+DEFINE_ACTION_FUNCTION cd_spear_ancillary
+  INT_VAR makeproj   = 1
+          proj_spd   = 40
+  STR_VAR name       = ""
+  RET proj
+BEGIN
+
+//  COPY ~cd_project_javelin/bam/%name%c.bam~                   ~override~             // description art
+  COPY ~cd_project_javelin/bam/%name%i%enhanced_edition%.bam~ ~override/%name%i.bam~ // icon art - grab 1 or 2 cycle bam, depending on game
+       
+  OUTER_SET proj = "-1"
+  ACTION_IF makeproj BEGIN 
+  
+    COPY ~cd_project_javelin/bam/%name%.bam~ ~override~ // projectile art
+    COPY ~cd_project_javelin/pro/cdjav0.pro~ ~override/%name%.pro~
+      WRITE_SHORT  0x0a proj_spd
+      WRITE_ASCIIE 0x104 ~%name%~ #8
+    ADD_PROJECTILE ~override/%name%.pro~
+    OUTER_SET proj = IDS_OF_SYMBOL (~missile~ ~%name%~)
+    
+  END   
+    
+  APPEND ~tooltip.2da~ ~%name% 15527 15529 -1~ // tooltip stuff
+  
+END 
+
+DEFINE_PATCH_FUNCTION cd_spear_edits
+  INT_VAR enchantment = 0
+          thac0_adj   = 0
+          weight      = 0
+          returning   = 0
+          price       = 0
+          lore        = 0
+          proj        = 0
+          color1      = "-1" // head/blade minor (21)
+          color2      = "-1" // grip/staff minor (20)
+  STR_VAR name        = ""
+          cicon       = csper01
+BEGIN
+  
+  PATCH_IF enchantment > 0 BEGIN 
+    WRITE_LONG 0x18 (THIS BOR BIT6) // add magical flag
+  END   
+  WRITE_SHORT 0x42 lore // lore to ID
+  PATCH_IF returning BEGIN
+    WRITE_SHORT 0x38    1 // stack size
+  END   
+  WRITE_ASCIIE 0x3a ~%name%i~ #8 // item icon
+  WRITE_ASCIIE 0x58 ~%cicon%~ #8 // desc icon
+  WRITE_LONG 0x34 price       // price
+  WRITE_LONG 0x4c weight      // weight
+  WRITE_LONG 0x60 enchantment // enchantment
+  PATCH_IF enchantment > 3 BEGIN SET wspd = 0 END ELSE BEGIN SET wspd = (4 - enchantment) END 
+  LPF ALTER_HEADER INT_VAR to_hit = (enchantment + thac0_adj) damage = enchantment speed = wspd STR_VAR icon = EVAL ~%name%i~ END
+  LPF ALTER_HEADER INT_VAR match_type = 2 charges = (1 - returning) projectile = proj END // ranged projectile
+  PATCH_IF color1 >= 0 BEGIN 
+    LPF ALTER_EFFECT INT_VAR check_headers = 0 match_opcode = 7 match_parameter2 = 21 parameter1 = color1 END
+  END  
+  PATCH_IF color2 >= 0 BEGIN 
+    LPF ALTER_EFFECT INT_VAR check_headers = 0 match_opcode = 7 match_parameter2 = 20 parameter1 = color2 END
+  END  
+          
+END 

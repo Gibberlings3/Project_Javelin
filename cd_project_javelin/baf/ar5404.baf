@@ -1,0 +1,7 @@
+IF
+  Global("cd_elegy","MYAREA",0)
+THEN
+  RESPONSE #100
+    SetGlobal("cd_elegy","MYAREA",1)
+    GiveItemCreate("cdjav2e","Container1",0,0,0)
+END

@@ -1,0 +1,8 @@
+// this file to be stored as UTF8 and will NOT be converted to ANSI for non-EE games
+// this file only contains text used by the installer and not game strings
+
+@0 = ~Project Javelin~
+// @1 is copied from Anthology, where it's @27
+@1 = ~DLC Merger is required before mods can be installed on this game. Check the readme for more information and a link to download DLC Merger.~
+// @2 is copied from Anthology, where it's @25
+@2 = ~This component is not available for your game.~

@@ -1,0 +1,580 @@
+BACKUP ~weidu_external/cd_project_javelin/backup~
+SUPPORT ~https://www.gibberlings3.net/forums/forum/28-miscellaneous-released-mods/~
+
+VERSION ~Beta 1~
+
+README ~cd_project_javelin/lang/%LANGUAGE%/readme-cd_project_javelin.html~ ~cd_project_javelin/readme-cd_project_javelin.html~
+
+ALWAYS 
+
+  ACTION_IF ((FILE_EXISTS ~dlc/sod-dlc.zip~) OR (FILE_EXISTS ~sod-dlc.zip~)) THEN BEGIN FAIL @1 END // DLC Merger check
+  
+  ACTION_IF !VARIABLE_IS_SET cd_project_javelin_always BEGIN 
+  
+    OUTER_SET cd_project_javelin_always = 1
+    INCLUDE ~cd_project_javelin/lib/functions.tpa~ // mod-specific macros and functions
+
+    ACTION_IF enhanced_edition BEGIN // ee games
+    
+      OUTER_SET silence_immunity   = IDS_OF_SYMBOL (~splstate~ ~SILENCE_IMMUNITY~) // eefp
+      OUTER_SET 50sonic_immunity   = IDS_OF_SYMBOL (~splstate~ ~50_PERCENT_SONIC_IMMUNITY~) // iwdee bard songs via iwdee/iwdification/scs/et al
+
+      OUTER_SPRINT ~tra_location~ ~cd_project_javelin/lang~
+
+    END ELSE BEGIN
+
+      OUTER_SET silence_immunity   = "-1"
+      OUTER_SET 50sonic_immunity   = "-1"
+      
+      OUTER_SPRINT ~tra_location~ ~weidu_external/cd_project_javelin/lang~
+
+      // convert strings from UTF-8 for originals
+      ACTION_DEFINE_ARRAY cdnoconvert BEGIN weidu orig END
+      ACTION_DEFINE_ARRAY cdreload BEGIN game END
+      LAF HANDLE_CHARSETS INT_VAR from_utf8 = 1 infer_charsets = 1
+                          STR_VAR default_language = ~en_us~ tra_path = ~cd_project_javelin/lang~ out_path = ~weidu_external/cd_project_javelin/lang~ noconvert_array = cdnoconvert reload_array = cdreload END
+
+  
+      LOAD_TRA ~cd_project_javelin/lang/%LANGUAGE%/orig.tra~
+    END
+    
+  END // always var check  
+  
+END
+
+AUTO_TRA ~%tra_location%/%s~
+
+LANGUAGE
+  ~English~
+  ~en_us~
+  ~cd_project_javelin/lang/en_us/game.tra~
+  ~cd_project_javelin/lang/en_us/weidu.tra~
+
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////                                                  \\\\\
+///// javelins                                         \\\\\
+/////                                                  \\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+
+BEGIN @0 DESIGNATED 1
+REQUIRE_PREDICATE GAME_IS ~bgee bg2ee eet iwdee bgt bg2 tob tutu tutu_totsc~ @2
+LABEL ~cd_project_javelin~
+
+/////                                                  \\\\\
+///// set baseline data                                \\\\\
+/////                                                  \\\\\
+
+// base chance is used as a d100 threshold to clone ammo in containers (arrows, bolts, throwing daggers, &c.) into low-level javelins
+OUTER_SET base_chance = 5
+
+// basic stack size for javelins; also used 
+ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3080~ BEGIN OUTER_SET jav_stack = 999 END ELSE // anthology's various ammo stack increase components
+ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3081~ BEGIN OUTER_SET jav_stack =  40 END ELSE  
+ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3082~ BEGIN OUTER_SET jav_stack =  80 END ELSE 
+ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3083~ BEGIN OUTER_SET jav_stack = 120 END ELSE 
+                                                 BEGIN OUTER_SET jav_stack =  20 END      // otherwise just use 20
+
+// if a mod increases spear damage, use those as baseline - used in item descripts and set in base javelin so it propagates
+ACTION_IF ((MOD_IS_INSTALLED ~zstweaks.tp2~ ~1150~) OR 
+           (MOD_IS_INSTALLED ~zstweaks.tp2~ ~103~) OR
+           (MOD_IS_INSTALLED ~iwdification.tp2~ ~190~)) BEGIN // Make spears do a baseline damage of 1d8, not 1d6 
+  OUTER_SET melee_die  = 6
+  OUTER_SET ranged_die = 8
+END ELSE BEGIN  
+  OUTER_SET melee_die  = 4
+  OUTER_SET ranged_die = 6
+END 
+
+/////                                                  \\\\\
+///// animations                                       \\\\\
+/////                                                  \\\\\
+      
+COPY ~cd_project_javelin/anim/wqlspa1.bam~ ~override~             // 1h spear overhead (ranged) animation, large [human]
+     ~cd_project_javelin/anim/wqlspa5.bam~ ~override~             // 1h spear thrust (melee) animation, large [human]
+     ~cd_project_javelin/anim/wqlspa1.bam~ ~override/wqnspa1.bam~ // 1h spear overhead (ranged) animation, large [unk]
+     ~cd_project_javelin/anim/wqlspa5.bam~ ~override/wqnspa5.bam~ // 1h spear thrust (melee) animation, large [unk]
+     ~cd_project_javelin/anim/wqmspa1.bam~ ~override~             // 1h spear overhead (ranged) animation, large [elf]
+     ~cd_project_javelin/anim/wqmspa5.bam~ ~override~             // 1h spear thrust (melee) animation, large [elf]
+     ~cd_project_javelin/anim/wqsspa1.bam~ ~override~             // 1h spear overhead (ranged) animation, large [dwarf]
+     ~cd_project_javelin/anim/wqsspa5.bam~ ~override~             // 1h spear thrust (melee) animation, large [dwarf]
+
+/////                                                  \\\\\
+///// making the items                                 \\\\\
+/////                                                  \\\\\
+
+// basic +0 javelin, will be used as a base for other items
+LAF cd_spear_ancillary STR_VAR name = cdjav0 RET cdjav0_proj = proj END // copies BAMs, makes projectile, appends tooltip
+COPY ~cd_project_javelin/itm/cdjav0.itm~ ~override~
+  SAY 0x08 @1000
+  SAY 0x0c @1000
+  SAY 0x50 @1001
+  WRITE_SHORT 0x38 jav_stack
+  LPF ALTER_HEADER INT_VAR match_type = 2 projectile = cdjav0_proj 
+    flag_strength = (1 - enhanced_edition) flag_str_damage = enhanced_edition END // use BIT0 on oBG2, BIT2 on EEs
+
+// make high quality javelin from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav0q RET cdjav0q_proj = proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav0q.itm~
+  SAY 0x08 @1014
+  SAY 0x0c @1014
+  SAY 0x50 @1015
+  LPF cd_spear_edits INT_VAR color1 = 15 color2 = 26 thac0_adj = 1 weight = 3 price = 5 proj = cdjav0q_proj STR_VAR name = EVAL ~%DEST_RES%~ END 
+
+// make javelin +1 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav1 RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1.itm~
+  SAY 0x0c @1002
+  SAY 0x54 @1003
+  LPF cd_spear_edits INT_VAR lore = 20 color1 = 67 color2 = 63 enchantment = 1 weight = 2 price = 10 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
+
+// make burning Javelin +1 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav1b RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1b.itm~
+  SAY 0x0c @1019
+  SAY 0x54 @1020
+  LPF cd_spear_edits INT_VAR lore = 25 color1 = 80 color2 = 94 enchantment = 1 weight = 2 price = 25 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
+  // fire effects
+  LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 9 target = 2 parameter1 = (64 << 8) parameter2 = (21 + (20 << 16)) timing = 2 END // glowing spearhead (64 red 0 g/b)
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 12 target = 2 parameter2 = (8 << 16) resist_dispel = 1 timing = 1 savingthrow = BIT0 dicenumber = 1 dicesize = 4 END // 1d4 fire
+  PATCH_IF enhanced_edition BEGIN 
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 insert_point = 0 opcode = 324 target = 2 parameter2 = 3 resist_dispel = 2 STR_VAR resource = EVAL ~%DEST_RES%~ END // fire immunity
+  END   
+
+// make Poisoned Javelin +1 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav1p RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1p.itm~
+  SAY 0x0c @1004
+  SAY 0x54 @1005
+  LPF cd_spear_edits INT_VAR lore = 30 color1 = 7 color2 = 5 enchantment = 1 weight = 2 price = 30 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
+  // now add poison effects
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 25 target = 2 parameter1 = 2 parameter2 = 2 resist_dispel = 2 duration = 10 savingthrow = BIT2 END // poison
+  PATCH_IF enhanced_edition BEGIN 
+    LPF ALTER_EFFECT INT_VAR match_opcode = 25 special = 6 END // attach poison icon directly to poison effect
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 insert_point = 0 opcode = 324 target = 2 parameter2 = 55 resist_dispel = 2 STR_VAR resource = EVAL ~%DEST_RES%~ END // golem immunity
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 insert_point = 0 opcode = 324 target = 2 parameter2 = 77 resist_dispel = 2 STR_VAR resource = EVAL ~%DEST_RES%~ END // poison immunity
+  END ELSE BEGIN 
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 142 target = 2 parameter2 = 6 resist_dispel = 2 duration = 10 savingthrow = BIT2 END // poison icon
+  END   
+
+// make Returning Javelin +2 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav2 RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav2.itm~
+  SAY 0x0c @1006
+  SAY 0x54 @1007
+  LPF cd_spear_edits INT_VAR lore = 40 color1 = 68 color2 = 64 enchantment = 2 weight = 2 price = 2500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
+  
+// make iron elegy +2 from basic javelin
+LAF cd_spear_ancillary INT_VAR proj_spd = 30 STR_VAR name = cdjav2e RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav2e.itm~
+  SAY 0x0c @1016
+  SAY 0x54 @1017
+  LPF cd_spear_edits INT_VAR lore = 45 color1 = 79 color2 = 93 enchantment = 2 weight = 15 price = 5000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
+  WRITE_SHORT 0x26 12 // min str
+  // 10% silence on hit
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode =  38 target = 2 timing = 0 duration = 12 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 END // silence
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 142 target = 2 parameter2 = 34 timing = 0 duration = 12 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 END // silence icon
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 174 target = 2 timing = 4 duration = 12 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = eff_e06 END // expiry sound
+  LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 139 target = 2 parameter1 = RESOLVE_STR_REF(@1018) timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 END // string
+  PATCH_IF !enhanced_edition BEGIN 
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 215 target = 2 timing = 0 duration = 3 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = sph1hi01 END // visual
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 215 target = 2 timing = 0 duration = 3 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = sphlhi02 END // visual
+  END ELSE BEGIN  
+    LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 177 target = 2 parameter1 = 5 parameter2 = 5 timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = bardsil END // bard song silenced
+    PATCH_IF !game_is_iwdee BEGIN // bgee, bg2ee, eet
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 174 target = 2 timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = eff_m58 END // sound
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 141 target = 2 parameter2 = 6 timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 END // lighting
+    END ELSE BEGIN  
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 174 target = 2 timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = ~#eff_p07~ END // sound
+      LPF ALTER_EFFECT INT_VAR match_opcode = 174 match_timing = 4 STR_VAR resource = ~#eff_e05~ END // different sounds for iwdee    
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 215 target = 2 timing = 1 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 STR_VAR resource = alterh END // visual
+    END
+    PATCH_IF silence_immunity > 0 BEGIN // if silence_immunity is a spell state
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 insert_point = 0 opcode = 324 target = 2 parameter1 = silence_immunity parameter2 = 110 resist_dispel = 1 probability1 = 9 STR_VAR resource = EVAL ~%DEST_RES%~ END // silence immunity
+    END  
+    PATCH_IF 50sonic_immunity > 0 BEGIN // if 50% sonic immunty (IWD bard song)
+      LPF ADD_ITEM_EFFECT INT_VAR type = 99 insert_point = 0 opcode = 324 target = 2 parameter1 = 50sonic_immunity parameter2 = 110 resist_dispel = 1 probability1 = 4 STR_VAR resource = EVAL ~%DEST_RES%~ END // silence immunity
+    END
+  END 
+
+// make Returning Javelin +3 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav3 RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav3.itm~
+  SAY 0x0c @1008
+  SAY 0x54 @1009
+  LPF cd_spear_edits INT_VAR lore = 50 color1 = 44 color2 = 22 enchantment = 3 weight = 2 price = 6000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
+
+// make Evergreen Javelin +3 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav3e RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav3e.itm~
+  SAY 0x0c @1010
+  SAY 0x54 @1011
+  LPF cd_spear_edits INT_VAR lore = 65 color1 = 7 color2 = 36 enchantment = 3 weight = 2 price = 9500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 END
+
+// make Evergreen Javelin +4 from basic javelin
+LAF cd_spear_ancillary STR_VAR name = cdjav4e RET proj END // copies BAMs, makes projectile, appends tooltip
+COPY_EXISTING ~cdjav0.itm~ ~override/cdjav4e.itm~
+  SAY 0x0c @1012
+  SAY 0x54 @1013
+  LPF cd_spear_edits INT_VAR color1 = 52 color2 = 90 enchantment = 4 weight = 2 price = 17000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 END
+
+// outerplanar damage for evergreen
+COPY ~cd_project_javelin/wav/cdjav3e.wav~  ~override~       // quad damage sound - not worth to convert for one file
+COPY ~cd_project_javelin/eff/cdjav3e.eff~  ~override~       // eff to play sound
+COPY ~cd_project_javelin/eff/cdjav3e0.eff~ ~override~       // +3 melee double
+  WRITE_LONG 0x3c melee_die   // base die size
+COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav3e2.eff~ // +3 ranged double
+  WRITE_SHORT 0x22 128        // damage type: missile
+  WRITE_LONG  0x3c ranged_die // base die size
+COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav4e0.eff~ // +4 melee double
+              ~cdjav3e2.eff~ ~override/cdjav4e2.eff~ // +4 ranged double
+  WRITE_LONG 0x1c 4 // +3 > +4 fixed damage
+COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav3e1.eff~ // +3 melee quadruple
+              ~cdjav3e2.eff~ ~override/cdjav3e3.eff~ // +3 melee quadruple
+              ~cdjav4e0.eff~ ~override/cdjav4e1.eff~ // +4 melee quadruple
+              ~cdjav4e2.eff~ ~override/cdjav4e3.eff~ // +4 melee quadruple
+  WRITE_LONG 0x1c (THIS * 3) // +3 > +9 OR +4 > +12 fixed damage
+  WRITE_LONG 0x38 (THIS * 3) // 1dX to 3dX
+
+OUTER_SET prob = 4
+COPY_EXISTING ~cdjav3e.itm~ ~override~
+              ~cdjav4e.itm~ ~override~
+  // races: demonic, rakshasha, mephit, elemental, genie, githyanki, (anti)solar, (dark) planetar, salamander
+  PATCH_FOR_EACH race IN 109 121 128 139 145 147 152 156 157 158 159 169 BEGIN 
+    LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = cdjav3e              END // melee quadruple sound
+    LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = EVAL ~%SOURCE_RES%1~ END // melee quadruple
+    LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability2 = (1 + prob) STR_VAR resource = EVAL ~%SOURCE_RES%0~ END // melee double
+    LPF ADD_ITEM_EFFECT INT_VAR type = 2 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = cdjav3e              END // ranged quadruple sound
+    LPF ADD_ITEM_EFFECT INT_VAR type = 2 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = EVAL ~%SOURCE_RES%3~ END // ranged quadruple
+    LPF ADD_ITEM_EFFECT INT_VAR type = 2 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability2 = (1 + prob) STR_VAR resource = EVAL ~%SOURCE_RES%2~ END // ranged double
+  END  
+  SET prob += 15
+
+/////                                                  \\\\\
+///// item placement                                   \\\\\
+/////                                                  \\\\\
+
+// javelins below +2 are scattered into loot and stores
+
+ACTION_IF game_is_iwdee BEGIN // iwdee
+
+  EXTEND_BOTTOM ~ar5404.bcs~ ~cd_project_javelin/baf/ar5404.baf~ // add iron elegy to top of sheverash tower
+  
+  COPY_EXISTING ~ldd_nym.sto~ ~override~ // add +3 returning to nym
+    LPF ADD_STORE_ITEM_EX STR_VAR item_name = cdjav3 position = EVAL "AFTER moradin" flags = identified END
+    BUT_ONLY
+
+END
+
+ACTION_IF game_includes_bg1 BEGIN // bgee, eet, bgt, tutu
+
+  // add returning +2 javelin to genthore at the cloakwood mine entrance by replacing throwing axes
+  COPY_EXISTING ~%tutu_var%gentho.cre~ ~override~
+    LPF DELETE_CRE_ITEM STR_VAR item_to_delete = EVAL ~%tutu_var%ax1h04~ END
+    ADD_CRE_ITEM ~cdjav2~ #0 #0 #0 ~NONE~ ~weapon~
+    LPF cd_transfer_profs INT_VAR old_bg1 = 0x74 old_bg2 = 92 new_bg1 = 0x71 new_bg2 = 98 END // any prof with axe, set to spear (if lower)
+    BUT_ONLY
+
+/*ACTION_IF game_includes_sod BEGIN // add iron elegy to sod
+  
+    // cloning a skeleton archer, adding iron elegy, and replacing one of the skeletons in kanaglym
+    COPY_EXISTING ~bdskgr04.cre~ ~override/cdskgr04.cre~
+      LPF DELETE_CRE_ITEM STR_VAR item_to_delete = bow03 END
+      LPF DELETE_CRE_ITEM STR_VAR item_to_delete = arow01 END
+      LPF DELETE_CRE_ITEM STR_VAR item_to_delete = arow09 END
+      ADD_CRE_ITEM ~cdjav2e~ #0 #0 #0 ~NONE~ ~weapon~
+      LPF cd_transfer_profs INT_VAR old_bg1 = 0x70 old_bg2 = 104 new_bg1 = 0x71 new_bg2 = 98 END // any prof with bow, set to spear (if lower)
+      BUT_ONLY
+    
+    COPY_EXISTING ~bd5300.are~ ~override~ // give to skelly archer in kanaglym
+      READ_LONG  0x54 actor_off
+      READ_SHORT 0x58 actor_num
+      FOR (index = 0 ; index < actor_num ; ++index) BEGIN 
+        READ_SHORT (actor_off + 0x20 + (index * 0x110)) x_coord
+        READ_SHORT (actor_off + 0x22 + (index * 0x110)) y_coord
+        PATCH_IF ((x_coord = 1942) AND (y_coord = 561)) BEGIN
+          WRITE_ASCII (actor_off + 0x80 + (index * 0x110)) ~cdskgr04~ #8
+          SET index = actor_num // kill loop
+        END
+      END
+      BUT_ONLY       
+          
+  
+  END */
+    
+END 
+
+ACTION_IF game_includes_soa BEGIN // bg2ee, eet, bgt, obg2
+  
+  COPY_EXISTING ~ribald.sto~ ~override~ // add +2 returning to adventurer's mart
+    LPF ADD_STORE_ITEM_EX STR_VAR item_name = cdjav2 position = EVAL "AFTER sper05" flags = identified END
+    BUT_ONLY
+
+  // add evergreen +3 to the wyvern cultist in the north forest
+  COPY_EXISTING ~wyvfight.cre~ ~override~
+    LPF DELETE_CRE_ITEM STR_VAR item_to_delete = sper05 END // remove +2 spear
+    ADD_CRE_ITEM ~cdjav3e~ #0 #0 #0 ~NONE~ ~weapon~ EQUIP
+    READ_LONG 0x2b8 slot_off
+    WRITE_SHORT (slot_off + 0x4e) 1 // set javelin to melee ability
+    BUT_ONLY
+
+  COMPILE ~cd_project_javelin/dlg/cromwell.d~ // upgrade evergreen +3 to +4 [cromwell]
+  EXTEND_BOTTOM ~ar0334.bcs~ ~cd_project_javelin/baf/ar0334.baf~
+
+  ACTION_IF game_includes_tob BEGIN // bg2ee, eet, bgt, obg2
+
+    COMPILE ~cd_project_javelin/dlg/cespenar.d~ // upgrade evergreen +3 to +4 [cespenar]
+    EXTEND_BOTTOM ~botsmith.bcs~ ~cd_project_javelin/baf/botsmith.baf~
+
+  END
+  
+END 
+
+/* basic logic for placing low-level javelins in stores: 
+- skip if the store doesn't sell basic spears (sper01)
+- if a store sells throwing daggers or axes (dagg05), add basic javelins
+- if a store also sells +1 daggers/axes/spears, add +1 javelins
+- if they also sell poisoned ammo, sell poisoned spears
+- if they also sell fire ammo, sell fire spears
+*/
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.sto$~ ~override~
+  READ_LONG 0x08 type
+  PATCH_IF type != 5 BEGIN // not a bag
+    SET spear = 0
+    SET jav0  = 0
+    SET jav1  = 0
+    SET jav1p = 0
+    SET jav1b = 0
+    SPRINT lspear ~~
+    READ_LONG 0x34 sale_off
+    READ_LONG 0x38 sale_num
+    FOR (index = 0 ; index < sale_num ; ++index) BEGIN 
+      READ_ASCII (sale_off + 0x00 + (index * 0x1c)) item
+      PATCH_IF ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Ss][Pp][Ee][Rr]01$" = 0) BEGIN // spear 
+        SET spear = 1
+        SPRINT lspear ~%item%~
+      END ELSE  
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]05$" = 0) OR  // throwing dagger 
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Xx]1[Hh]04$" = 0)) BEGIN // throwing axe
+        SET jav0 = 1
+        READ_LONG  (sale_off + 0x14 + (index * 0x1c)) jav0q
+        READ_LONG  (sale_off + 0x18 + (index * 0x1c)) jav0i
+      END ELSE  
+      PATCH_IF ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Ss][Pp][Ee][Rr]02$" = 0) BEGIN  // spear +1
+        SET jav1 = 1
+        SPRINT lspear ~%item%~
+      END ELSE  
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]02$" = 0) OR  // dagger +1
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Xx]1[Hh]02$" = 0)) BEGIN // axe +1
+        SET jav1 = 1
+      END ELSE  
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]16$" = 0) OR      // poisoned throwing daggers
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]05$" = 0) OR      // arrow of biting
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]04$" = 0) OR      // bolt of biting
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Rr][Tt]05$$" = 0)) BEGIN // asp's nest
+        SET jav1p = 1
+      END ELSE  
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]08$" = 0) OR        // arrow of fire
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]0[47]$" = 0)) BEGIN // sunstone/fire bullet
+        SET jav1b = 1
+      END ELSE  
+      PATCH_IF ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Ss][Pp][Ee][Rr][0-9]+$" = 0) BEGIN  // any spear (for placement)
+        SPRINT lspear ~%item%~
+      END   
+    END 
+    //PATCH_PRINT ~ %SOURCE_FILE%: spear %spear%, jav0 %jav0%, jav1 %jav1%, jav1p %jav1p%~
+    PATCH_IF spear AND jav0 BEGIN 
+      LPF ADD_STORE_ITEM_EX INT_VAR charge1 = 20 stack = jav0q unlimited = jav0i STR_VAR item_name = cdjav0 position = EVAL "AFTER %lspear%" flags = identified END
+      PATCH_IF jav1p BEGIN 
+        LPF ADD_STORE_ITEM_EX INT_VAR charge1 = 2 stack = 5 unlimited = 0 STR_VAR item_name = cdjav1p position = "AFTER cdjav0" flags = identified END
+      END   
+      PATCH_IF jav1b BEGIN 
+        LPF ADD_STORE_ITEM_EX INT_VAR charge1 = 2 stack = 5 unlimited = 0 STR_VAR item_name = cdjav1b position = "AFTER cdjav0" flags = identified END
+      END   
+      PATCH_IF jav1 BEGIN 
+        LPF ADD_STORE_ITEM_EX INT_VAR charge1 = 5 stack = 5 unlimited = 0 STR_VAR item_name = cdjav1 position = "AFTER cdjav0" flags = identified END
+      END  
+    END  
+  END
+  BUT_ONLY
+
+/* basic logic for javelins-as-loot on a per-container basis: 
+if one of these items is found, chance to add an identical stack of javelins:
+ - throwing axes, throwing daggers: 2x chance of basic javelin stack (secondary roll of d20; 20 = high quality stack instead)
+ - arrows, bolts, bullets: chance of basic javelin stack (if 3% pass, secondary roll of d20; 20 = high quality stack instead)
+ - +1 arrows, bolts, bullets: chance of +1 javelin stack
+ - fire arrows, fire/sunstone bullets: chance of +1 fire javelin
+ - asp's nest, poisoned throwing daggers, arrows/bolts of biting: chance of +1 poison javelin
+*/
+
+COPY_EXISTING_REGEXP GLOB ~^.+\.are$~ ~override~
+  READ_LONG  0x70 cont_off
+  READ_SHORT 0x74 cont_num
+  READ_SHORT 0x78 item_off
+  SET item_delta = 0
+  FOR (index = 0 ; index < cont_num ; ++index) BEGIN 
+    SET jav0  = 0
+    SET jav1  = 0
+    SET jav1b = 0
+    SET jav1p = 0
+    SET local_delta = 0
+    CLEAR_ARRAY cd_new_javs
+    WRITE_LONG (cont_off + 0x40 + (index * 0xc0)) (THIS + item_delta) // update index if we've inserted items
+    READ_LONG (cont_off + 0x40 + (index * 0xc0)) item_idx
+    READ_LONG (cont_off + 0x44 + (index * 0xc0)) item_num
+    FOR (index2 = item_idx ; index2 < (item_idx + item_num) ; ++index2) BEGIN
+      READ_ASCII (item_off + 0x00 + (index2 * 0x14)) item
+      PATCH_IF  (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]05$" = 0) OR  // throwing dagger 
+                 ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Xx]1[Hh]04$" = 0)) BEGIN // throwing axe
+        SET check = RANDOM (1 100)
+        PATCH_IF check <= (2 * base_chance) BEGIN 
+          SET check = RANDOM (1 20)
+          PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
+          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
+        END   
+      END ELSE         
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]01$" = 0) OR     // generic arrow 
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]01$" = 0) OR     // generic bolt
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]01$" = 0)) BEGIN // generic bullet
+        SET check = RANDOM (1 100)
+        PATCH_IF check <= base_chance BEGIN 
+          SET check = RANDOM (1 20)
+          PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
+          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
+        END   
+      END ELSE             
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]02$" = 0) OR     // +1 arrow 
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]02$" = 0) OR     // +1 bolt
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]03$" = 0)) BEGIN // +1 bullet
+        SET check = RANDOM (1 100)
+        PATCH_IF check <= base_chance BEGIN 
+          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav0~ END 
+        END   
+      END ELSE         
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]16$" = 0) OR      // poisoned throwing daggers
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]05$" = 0) OR      // arrow of biting
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]04$" = 0) OR      // bolt of biting
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Rr][Tt]05$$" = 0)) BEGIN // asp's nest
+        SET check = RANDOM (1 100)
+        PATCH_IF check <= base_chance BEGIN 
+          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1p~ END 
+        END   
+      END ELSE          
+      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]08$" = 0) OR        // arrow of fire
+                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]0[47]$" = 0)) BEGIN // sunstone/fire bullet
+        SET check = RANDOM (1 100)
+        PATCH_IF check <= base_chance BEGIN 
+          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1b~ END 
+        END   
+      END
+    END // done looking through items
+    PATCH_PHP_EACH cd_new_javs AS idx => nitem BEGIN
+      //PATCH_PRINT ~ array: %nitem%, %idx% on %SOURCE_FILE%, container %index%~
+      READ_ASCII   (item_off + 0x00 + ((idx + local_delta) * 0x14)) template (20)
+      INSERT_BYTES (item_off + 0x00 + ((idx + local_delta) * 0x14)) 0x14
+      WRITE_ASCIIE (item_off + 0x00 + ((idx + local_delta) * 0x14)) ~%template%~ #20
+      WRITE_ASCIIE (item_off + 0x00 + ((idx + local_delta) * 0x14)) ~%nitem%~ #8
+      READ_SHORT   (item_off + 0x0a + ((idx + local_delta) * 0x14)) count
+      PATCH_IF count > jav_stack BEGIN // since arrows et al have higher stacks check quantity
+        WRITE_SHORT   (item_off + 0x0a + ((idx + local_delta) * 0x14)) jav_stack
+      END   
+      SET local_delta += 1
+      SET item_delta  += 1
+    END   
+    WRITE_LONG (cont_off + 0x44 + (index * 0xc0)) item_num + local_delta
+  END // cont loop
+  PATCH_IF item_delta BEGIN
+    PATCH_FOR_EACH offset IN 0x54 0x5c 0x60 0x64 0x68 0x70 /* 0x78 */ 0x7c 0x84 0x88 0x90 0xa0 0xa8 0xb0 0xb8 0xbc 0xc0 0xc4 0xcc BEGIN
+      READ_LONG offset off
+      PATCH_IF off > item_off BEGIN 
+        WRITE_LONG offset (THIS + (0x14 * item_delta))
+      END
+    END
+  END
+  BUT_ONLY  
+
+/////                                                  \\\\\
+///// PFNM updates                                     \\\\\
+/////                                                  \\\\\
+
+// bgee/bg2ee/eet PFNM already blocks spears, so use spear value to clone - use axes for everything else
+ACTION_IF game_is_bgee OR game_is_bg2ee OR game_is_eet BEGIN OUTER_SET projmatch = 55 END ELSE BEGIN OUTER_SET projmatch = 9 END
+COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
+  READ_ASCII 0x00 type (3)
+  SET min_size = 0
+  PATCH_IF ("%type%" STRING_COMPARE_CASE "spl" = 0) BEGIN
+    READ_LONG  0x64 abil_off ELSE 0
+    READ_SHORT 0x68 abil_num ELSE 0
+    READ_LONG  0x6a fx_off   ELSE 0
+    SET counter_offset = 0x70
+    SET abil_length    = 0x28
+    SET global_loop    = 0
+    SET fx_type        = 0
+    SET min_size       = 0x72
+  END ELSE
+  PATCH_IF ("%type%" STRING_COMPARE_CASE "itm" = 0) BEGIN
+    READ_LONG  0x64 abil_off ELSE 0
+    READ_SHORT 0x68 abil_num ELSE 0
+    READ_LONG  0x6a fx_off   ELSE 0
+    SET counter_offset = 0x70
+    SET abil_length    = 0x38
+    SET global_loop    = 1
+    SET fx_type        = 0
+    SET min_size       = 0x72
+  END ELSE
+  PATCH_IF ("%type%" STRING_COMPARE_CASE "cre" = 0) BEGIN
+    READ_LONG  0x2c4 fx_off ELSE 0
+    READ_BYTE 0x33 fx_type ELSE 2
+    SET abil_off       = 0
+    SET abil_num       = 0
+    SET counter_offset = 0x2c8
+    SET abil_length    = 0
+    SET global_loop    = 1
+    SET min_size       = 0x2d4
+  END ELSE BEGIN
+    PATCH_PRINT ~Warning: PFNM update halting; file type not recognized (%type%)~
+  END
+  PATCH_IF ((SOURCE_SIZE >= min_size) AND (min_size != 0)) BEGIN // min_size must get set by file type detection
+    SET new_fx = 0
+    FOR (index = (0 - global_loop) ; index < abil_num ; ++index) BEGIN
+      PATCH_IF (index < 0) BEGIN // if loop through globals needed
+        SET abil_fx_idx = 0
+      END ELSE BEGIN // otherwise normal ability
+        SET counter_offset = (abil_off + 0x1e + (abil_length * index))
+        READ_SHORT  (abil_off + 0x20 + (abil_length * index)) abil_fx_idx
+        SET abil_fx_idx += new_fx
+        WRITE_SHORT (abil_off + 0x20 + (abil_length * index)) (abil_fx_idx)
+      END
+      READ_SHORT counter_offset counter // fx_num on global loop, otherwise abil_fx_num
+      FOR (index2 = 0 ; index2 < counter ; ++index2) BEGIN
+        READ_SHORT (fx_off        + (0x08 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) opcode
+        READ_LONG  (fx_off + 0x08 + (0x10 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) param2
+        PATCH_IF (((opcode = 83) OR (opcode = 197)) AND (param2 = projmatch)) BEGIN // protection from or bounce projectile
+          READ_ASCII (fx_off + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) template ((0x30 + (0xd8 * fx_type)))                  // read whole effect into a template
+          INSERT_BYTES (fx_off        + (0x08 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) (0x30 + (0xd8 * fx_type)) // insert effect
+          WRITE_ASCIIE (fx_off        + (0x08 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) "%template%"              // clones from template
+          WRITE_LONG   (fx_off + 0x08 + (0x10 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) (cdjav0q_proj - 1)        // update projectile to HQ javelin
+          INSERT_BYTES (fx_off        + (0x08 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) (0x30 + (0xd8 * fx_type)) // insert effect
+          WRITE_ASCIIE (fx_off        + (0x08 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) "%template%"              // clones from template
+          WRITE_LONG   (fx_off + 0x08 + (0x10 * fx_type) + ((abil_fx_idx + index2) * (0x30 + (0xd8 * fx_type)))) (cdjav0_proj - 1)         // update projectile to basic javelin
+          SET new_fx  += 2
+          SET counter += 2
+          SET index2  += 2
+        END
+      END 
+      WRITE_SHORT counter_offset counter
+    END
+
+    PATCH_IF ((min_size = 0x2d4) AND (new_fx > 0)) BEGIN // fix offsets for cre files if fx inserted
+      PATCH_FOR_EACH offset IN 0x2a0 0x2a8 0x2b0 0x2b8 0x2bc BEGIN
+        READ_LONG offset curr_off
+        PATCH_IF (fx_off < curr_off) BEGIN
+          WRITE_LONG offset (THIS + ((0x30 + (0xd8 * fx_type)) * new_fx))
+        END
+      END
+    END
+
+  END // end file size check
+  BUT_ONLY 

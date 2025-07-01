@@ -1,0 +1,9 @@
+IF
+  Global("cdjav_upgrade","MYAREA",1)
+  Global("ForgeStuff","GLOBAL",1)
+THEN
+  RESPONSE #100
+    SetGlobal("ForgeStuff","GLOBAL",0)
+    GiveItemCreate("cdjav4e",Player1,0,0,0) // completed item
+    ActionOverride("wsmith01",StartDialogueNoSet([PC]))
+END

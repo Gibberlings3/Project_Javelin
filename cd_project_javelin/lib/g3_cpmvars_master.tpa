@@ -1,0 +1,22 @@
+/*
+For anyone interested in using these: check out the modding resources 
+on G3's Github, specifically: 
+
+https://github.com/Gibberlings3/modding-resources/tree/master/code/cam
+*/
+
+ACTION_IF !game_includes_bg1 THEN BEGIN // I feel like these come up enough in BG&BG2 components to define them
+
+	OUTER_SPRINT "tutu_var" ""
+	OUTER_SPRINT "tutu_scriptbg" ""//BGT 'BG' prefix
+	OUTER_SPRINT "eet_var" ""
+
+END ELSE BEGIN
+
+  ACTION_IF game_is_bgee BEGIN INCLUDE ~cd_project_javelin/lib/g3_bgee_cpmvars.tpa~  END ELSE       // bgee
+  ACTION_IF game_is_eet  BEGIN INCLUDE ~eet/other/cpmvars/eet_cpmvars.tpa~ END ELSE       // eet
+  ACTION_IF game_is_bgt  BEGIN INCLUDE ~cd_project_javelin/lib/g3_bgt_cpmvars.tpa~   END ELSE       // bgt
+  ACTION_IF tutu_gen     BEGIN INCLUDE ~cd_project_javelin/lib/g3_tutu_cpmvars.tpa~  END ELSE BEGIN // tutu
+                               INCLUDE ~cd_project_javelin/lib/g3_bg_cpmvars.tpa~    END            // obg
+
+END

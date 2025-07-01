@@ -1,0 +1,76 @@
+/////                                                  \\\\\
+///// cd_transfer_profs                                \\\\\
+/////                                                  \\\\\
+
+/*
+
+if you have an item pack and are updating or adding an item on a creature, 
+this is a nifty little function to make sure that the targeted creature is
+proficient up to the same degree as their old weapon. The idea is simple;
+you designate the old proficiency in terms of its creature offset for
+oBG and BG2 value for checking 233s. The function will find and compare
+pips in the old prof and new and update the new prof if its lower. An
+example from Javelins:
+
+  LPF cd_transfer_profs INT_VAR old_bg1 = 0x74 old_bg2 = 92 new_bg1 = 0x71 new_bg2 = 98 END
+  
+This is to replace an axe with a spear. So we use the offset in the creature 
+file to oBG axe proficiency (0x74) and its BG2 prof value (92) and then compare 
+it against spear values (oBG 0x71 and BG2 98). 
+
+used:
+  Javelins, as cd_javelins/lib/cd_transfer_profs.tpa [symbolic link]
+
+platform:
+  bg2-based engines
+
+version history:
+  6/30/25: debut
+
+*/
+
+DEFINE_PATCH_FUNCTION cd_transfer_profs
+  INT_VAR old_bg1 = 0 // offset to obg prof
+          old_bg2 = 0 // offset to obg prof
+          new_bg1 = 0 // value of bg2 prof
+          new_bg2 = 0 // value of bg2 prof
+          min_pip = 1 // always set at lest this many pips in the new weapon
+BEGIN
+
+  SET has233 = "-1"
+  READ_BYTE  old_bg1 old
+  SET old = (old BAND 0b00000111) // active pips are the first three bits
+  READ_BYTE  new_bg1 new
+  SET new2 = (new BAND 0b11111000) // preserve old pips for later
+  SET new  = (new BAND 0b00000111) // active pips are the first three bits
+  READ_BYTE  0x33 fx_type
+  READ_LONG  0x2c4 fx_off
+  READ_LONG 0x2c8 counter // fx_num on global loop, otherwise abil_fx_num
+  FOR (index2 = 0 ; index2 < counter ; ++index2) BEGIN
+    READ_SHORT (fx_off        + (0x08 * fx_type) + (index2 * (0x30 + (0xd8 * fx_type)))) opcode
+    PATCH_IF opcode = 233 BEGIN // weap prof
+      READ_SHORT (fx_off + 0x04 + (0x10 * fx_type) + (index2 * (0x30 + (0xd8 * fx_type)))) param1a
+      READ_SHORT (fx_off + 0x06 + (0x10 * fx_type) + (index2 * (0x30 + (0xd8 * fx_type)))) param1b
+      READ_SHORT (fx_off + 0x08 + (0x10 * fx_type) + (index2 * (0x30 + (0xd8 * fx_type)))) param2a
+      READ_SHORT (fx_off + 0x0a + (0x10 * fx_type) + (index2 * (0x30 + (0xd8 * fx_type)))) param2b
+      PATCH_IF ((param2a = old_bg2) AND (old < param1a)) BEGIN SET old = param1a END // update old prof with pips from 233
+      PATCH_IF (param2a = new_bg2) BEGIN
+        SET has233 = index2
+        PATCH_IF (new < param1a) BEGIN SET new = param1a END // update new prof with pips from 233
+      END
+    END
+  END
+  // bounds checks
+  PATCH_IF (old < min_pip) BEGIN SET old = min_pip END // enforce the minimum
+  PATCH_IF (old > 5) BEGIN SET old = 5 END
+  PATCH_IF (new > 5) BEGIN SET new = 5 END
+  PATCH_IF (new < 0) BEGIN SET new = 0 END
+  PATCH_IF old > new BEGIN // if we need to add pips
+    PATCH_IF has233 >= 0 BEGIN
+      WRITE_SHORT (fx_off + 0x04 + (0x10 * fx_type) + (has233 * (0x30 + (0xd8 * fx_type)))) old // update existing 233 with the old count of pips
+    END ELSE BEGIN
+      WRITE_BYTE  new_bg1 (old + new2) // otherwise use obg pips
+    END
+  END
+
+END
