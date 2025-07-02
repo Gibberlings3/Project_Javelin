@@ -158,7 +158,7 @@ STATISTICS:
 
 Combat abilities:
 – Returns to the wielder's hand when thrown
-– Hit target is silenced for two rounds (Save vs. Spell negates)
+– 10% chance that target is silenced for two rounds (Save vs. Spell negates)
 
 THAC0: +2
 Damage: 1d%ranged_die%+2 (thrown, missile)

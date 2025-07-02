@@ -241,7 +241,7 @@ OUTER_SET prob = 4
 COPY_EXISTING ~cdjav3e.itm~ ~override~
               ~cdjav4e.itm~ ~override~
   // races: demonic, rakshasha, mephit, elemental, genie, githyanki, (anti)solar, (dark) planetar, salamander
-  PATCH_FOR_EACH race IN 109 121 128 139 145 147 152 156 157 158 159 169 BEGIN 
+  PATCH_FOR_EACH race IN 121 128 139 145 147 152 156 157 158 159 169 BEGIN 
     LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = cdjav3e              END // melee quadruple sound
     LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability1 = prob       STR_VAR resource = EVAL ~%SOURCE_RES%1~ END // melee quadruple
     LPF ADD_ITEM_EFFECT INT_VAR type = 1 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability2 = (1 + prob) STR_VAR resource = EVAL ~%SOURCE_RES%0~ END // melee double

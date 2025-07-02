@@ -155,7 +155,7 @@ Mubark was a half-ogre who dwelled near the Forest of Tethir. After a dispute wi
 STATISTICS:
 
 Combat Abilities: Javelin returns to the wielder's hand instantly after an attack is made
-Combat Ability (each hit): Save vs. spell or Silenced for two rounds
+Combat Ability (10% of hits): Save vs. spell or Silenced for two rounds
 THAC0:  +2 bonus
 Damage: 1d%ranged_die% + 2 (thrown, missile)
 Damage: 1d%melee_die% + 2 (melee, piercing)
