@@ -101,6 +101,27 @@ COPY ~cd_project_javelin/anim/wqlspa1.bam~ ~override~             // 1h spear ov
      ~cd_project_javelin/anim/wqsspa5.bam~ ~override~             // 1h spear thrust (melee) animation, large [dwarf]
 
 /////                                                  \\\\\
+///// proficiency description update                   \\\\\
+/////                                                  \\\\\
+
+// add javelin mention to existing spear proficiency description string
+COPY_EXISTING - ~weapprof.2da~ ~override~ // get string from weapprof
+  REPLACE_EVALUATE ~^\(SPEAR[ %TAB%]+[0-9][0-9]+[ %TAB%]+[0-9]+[ %TAB%]+\)\([0-9]+\)~ BEGIN
+    SET spear_strref = MATCH2
+  END ~%MATCH1%%MATCH2%~
+  
+ACTION_IF VARIABLE_IS_SET spear_strref BEGIN // sanity check
+
+  OUTER_SPRINT jav_desc @1025
+  ACTION_GET_STRREF spear_strref desc
+  OUTER_INNER_PATCH_SAVE desc ~%desc%~ BEGIN
+    REPLACE_TEXTUALLY ~\([ %TAB%%LNL%%MNL%]+<DOTS1>\)~ ~ %jav_desc%\1~
+  END
+  STRING_SET_EVALUATE spear_strref ~%desc%~
+
+END
+
+/////                                                  \\\\\
 ///// making the items                                 \\\\\
 /////                                                  \\\\\
 
@@ -577,4 +598,4 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
     END
 
   END // end file size check
-  BUT_ONLY 
+  BUT_ONLY
