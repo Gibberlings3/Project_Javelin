@@ -6,3 +6,5 @@
 @1 = ~DLC Merger is required before mods can be installed on this game. Check the readme for more information and a link to download DLC Merger.~
 // @2 is copied from Anthology, where it's @25
 @2 = ~This component is not available for your game.~
+@3 = ~This component requires the main component.~
+@4 = ~Allow Kensais and Cavaliers to Use Javelins~

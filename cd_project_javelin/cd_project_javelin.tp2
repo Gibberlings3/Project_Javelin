@@ -599,3 +599,19 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
 
   END // end file size check
   BUT_ONLY
+
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////                                                  \\\\\
+///// allow kensai, cavaliers to use javelins          \\\\\
+/////                                                  \\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
+
+BEGIN @4 DESIGNATED 2
+REQUIRE_PREDICATE MOD_IS_INSTALLED ~cd_project_javelin.tp2~ ~1~ @3
+LABEL ~cd_project_javelin_kensais_cavaliers~
+
+COPY_EXISTING_REGEXP GLOB ~^cdjav.+\.itm$~ ~override~
+  WRITE_BYTE 0x2f (THIS BAND `(BIT2 + BIT3)) // removes cavalier, kensai flags
+  BUT_ONLY
