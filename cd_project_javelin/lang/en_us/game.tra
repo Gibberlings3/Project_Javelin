@@ -1,3 +1,6 @@
+// this file to be stored as UTF8 and will be converted to ANSI for non-EE games
+// for non-EE, strings in this file may be overridden by strings in orig.tra
+
 @1000 = ~Javelin~
 @1001 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
 

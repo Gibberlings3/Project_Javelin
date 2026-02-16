@@ -1,0 +1,202 @@
+@1000 = ~Wurfspieß~
+@1001 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+EIGENSCHAFTEN:
+
+Schaden (Fernkampf): 1d%ranged_die% (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% (Stich)
+Initiativefaktor: 4
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 3~
+@1002 = ~Wurfspieß +1~
+@1003 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv. Dieser Wurfspieß wurde auf magische Weise verstärkt. Auf der Oberfläche sind Runen zu sehen, die schwach glühen.
+
+EIGENSCHAFTEN:
+
+ETW0-Bonus: -1
+Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Initiativefaktor: 3
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+@1004 = ~Vergifteter Wurfspieß~
+@1005 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+Die Speerspitze dieses Wurfspießes wurde mit einer dünnen Schicht Gift überzogen.
+
+EIGENSCHAFTEN:
+
+Bei einem Treffer erleidet das Ziel 2 Schadenspunkte durch Gift pro Sekunde für 10 Sekunden (Rettungswurf gg. Gift).
+
+ETW0-Bonus: -1
+Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Initiativefaktor: 3
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+@1006 = ~Wiederkehrender Wurfspieß +2~
+@1007 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+Diese besondere Waffe wurde von einem geschickten Schmied geschaffen und magisch verstärkt.
+
+EIGENSCHAFTEN:
+
+Kehrt sofort zum Werfer zurück.
+
+ETW0-Bonus: -2
+Schaden (Fernkampf): 1d%ranged_die% +2 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +2 (Stich)
+Initiativefaktor: 2
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+@1008 = ~Wiederkehrender Wurfspieß +3~
+@1009 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+Dieser Wurfspieß wurde von äußerst geschickten Händen geschmiedet und magisch verstärkt. Weder Scharten noch Riefen trüben die makellose Speerspitze. Im Kampf strahlt der Wurfspieß magische Kräfte aus und verleiht seinem Träger bessere Fertigkeiten im Umgang mit dieser Waffe.
+
+EIGENSCHAFTEN:
+
+Kehrt sofort zum Werfer zurück.
+
+ETW0-Bonus: -3
+Schaden (Fernkampf): 1d%ranged_die% +3 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +3 (Stich)
+Initiativefaktor: 1
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+
+@1010 = ~Immergrüne Lanze +3~
+@1011 = ~Die Immergrüne Lanze wurde ursprünglich entworfen, um durch eine intensive Verbindung zur Materiellen Ebene gegen extraplanare Kreaturen zu schützen. Trotz dieses erhabenen Ziels ist diese Verbindung im Laufe der Zeitalter verblasst, da sie stattdessen zu einer begehrten Waffe in den endlosen und blutigen Nachfolgekämpfen druidischer Zirkel in ganz Faerûn wurde. Der ewigen Streitigkeiten um die Immergrüne Lanze überdrüssig, verbannte die Großdruidin selbst den Wurfspieß schließlich aus den innerdruidischen Fehden. Sie forderte die Lanze als Tribut von einer ihrer Erzdrudinnen und veräußerte sie anschließend, damit niemand das Artefakt zurückverfolgen konnte.
+
+Obwohl ihre Macht geschwunden ist, bewahrt die Immergrüne Lanze noch immer einen Teil ihrer Kraft im Kampf gegen außerplanare Kreaturen.
+
+EIGENSCHAFTEN:
+
+Kehrt sofort zum Werfer zurück.
+
+Bei einem erfolgreichen Treffer gegen extraplanare Wesen besteht eine Chance von 5 %, dass der Schaden verdoppelt wird.
+
+ETW0-Bonus: -3
+Schaden (Fernkampf): 
+ 1d%ranged_die% +3 (Stich/Geschoss)
+ 2d%ranged_die% gg. extraplanare Wesen
+Schaden (Nahkampf): 
+ 1d%melee_die% +3 (Stich)
+ 2d%melee_die% +6 gg. extraplanare Wesen
+Initiativefaktor: 1
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+@1012 = ~Immergrüne Lanze +4~
+@1013 = ~Die Immergrüne Lanze wurde ursprünglich entworfen, um durch eine intensive Verbindung zur Materiellen Ebene gegen extraplanare Kreaturen zu schützen. Trotz dieses erhabenen Ziels ist diese Verbindung im Laufe der Zeitalter verblasst, da sie stattdessen zu einer begehrten Waffe in den endlosen und blutigen Nachfolgekämpfen druidischer Zirkel in ganz Faerûn wurde. Der ewigen Streitigkeiten um die Immergrüne Lanze überdrüssig, verbannte die Großdruidin selbst den Wurfspieß schließlich aus den innerdruidischen Fehden. Sie forderte die Lanze als Tribut von einer ihrer Erzdrudinnen und veräußerte sie anschließend, damit niemand das Artefakt zurückverfolgen konnte.
+
+Es ist Euch gelungen, mehr von der Macht der Immergrünen Lanze im Kampf gegen außerplanare Kreaturen freizusetzen.
+
+EIGENSCHAFTEN:
+
+Kehrt sofort zum Werfer zurück.
+
+Bei einem erfolgreichen Treffer gegen extraplanare Wesen besteht eine Chance von 20 %, dass der Schaden verdoppelt wird.
+
+ETW0-Bonus: -4
+Schaden (Fernkampf): 
+ 1d%ranged_die% +4 (Stich/Geschoss)
+ 2d%ranged_die% +8 gg. extraplanare Wesen
+Schaden (Nahkampf): 
+ 1d%melee_die% +4 (Stich)
+ 2d%melee_die% +8 gg. extraplanare Wesen
+Initiativefaktor: 0
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+@1014 = ~Hochwertiger Wurfspieß~
+@1015 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+EIGENSCHAFTEN:
+
+ETW0-Bonus: -1
+Schaden (Fernkampf): 1d%ranged_die% (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% (Stich)
+Initiativefaktor: 4
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 3~
+@1016 = ~Eiserne Elegie +2~
+@1017 = ~Wurfspieße sind üblicherweise leichte Speere mit federndem Schaft, die vor allem als Wurfwaffe dienen. Die Eiserne Elegie jedoch liegt schwer in Euren Händen, da sie über einen eisernen Schaft und eine Stahlspitze verfügt.
+
+Mubark war ein Halb-Oger, der nahe dem Tethirwald lebte. Nach einem Streit mit einem örtlichen Kleriker, der versuchte, Mubark aus dem Land zu vertreiben, gab Mubark die Elegie in Auftrag, um der Magie des Klerikers entgegenzuwirken, und konnte so seine Heimat vor weiteren Übergriffen schützen.
+
+EIGENSCHAFTEN:
+
+Kehrt sofort zum Werfer zurück.
+
+Bei einem erfolgreichen Treffer besteht eine Chance von 10 %, dass „Stille“ auf das Ziel gewirkt wird (Rettungswurf gg. Zauber).
+
+ETW0-Bonus: -2
+Schaden (Fernkampf): 1d%ranged_die% +2 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +2 (Stich)
+Initiativefaktor: 2
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 12
+
+Gewicht: 15~
+@1018 = ~Stille~
+@1019 = ~Feuerwurfspieß~
+@1020 = ~Wurfspieße sind leichte Speere mit federndem Schaft, die in erster Linie als Wurfwaffe konzipiert sind. Sie bestehen meist aus Holz und sind mit einer kleinen metallenen Speerspitze versehen. Der Schaft ist deutlich dünner als der eines zweihändigen Speers. Der Wurfspieß ist eine Fernkampfwaffe und dazu bestimmt, auf den Gegner geworfen zu werden. Zwar können Wurfspieße auch im Nahkampf eingesetzt werden, doch sind sie dafür nicht stabil genug und entsprechend wenig effektiv.
+
+Der Feuerwurfspieß ist ein magischer Wurfspieß, der beim Wurf auf einen Feind in Flammen aufgeht. Die Wirkung ist so ähnlich, als ob man einen mit Öl übergossenen Wurfspieß anzündet.
+
+EIGENSCHAFTEN:
+
+Bei jedem Treffer erleidet das Ziel 1W2 Schadenspunkte durch Feuer (Rettungswurf gg. Zauber).
+
+ETW0-Bonus: -1
+Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
+Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Initiativefaktor: 3
+Fertigkeit: Speer
+Typ: 1-händig
+Mindeststärke: 5
+
+Gewicht: 2~
+// cespenar's dialogue for the evergreen upgrade
+@1021 = ~Ooooh. Oh! Ahem. Boss, Ihr seid doch nicht böse auf Cespenar, oder? Diese Immergrüne Lanze wird besonders scharf, äh, spitz gegen Teufelchen!~
+@1022 = ~Und sie könnte noch spitzer werden mit zwei Smaragden, aber ich sehe hier nicht die richtigen Glitzersteine. Ich schätze, ich suche weiter.~
+@1023 = ~Mit zwei smaragdgrünen Glitzersteinen wird sie noch spitzer! Für 10.000 Gold, wollt Ihr das?~
+@1024 = ~Na gut, Cespenar mag seine Immergrüne lieber stumpf und nicht so spitz.~
+
+// added to the spear proficency description - keep the leading space
+@1025 = ~ Dies schließt auch Wurfspieße ein, kleinere 1-händige Waffen, die geworfen werden können.~
+
+// why the jump in numbers? this was originally written for G3CIP and I didn't want to re-index
+@1073 = ~Oooh, nun das ist doch mal eine Wendung: Die Immergrüne Lanze. Da draußen, nahe Handelstreff, gab es Ärger und mehrere Druiden machten sich auf die Suche nach ihr.~
+@1074 = ~Ich kann eine Macht spüren, doch sie ist verblasst, da sie zu lange ungenutzt war. Ein Paar Smaragde sollte Abhilfe schaffen.~
+@1075 = ~Oh, Ihr habt tatsächlich auch einige Smaragde. Die können wir nutzen, um die Immergrüne noch weiter zu verbessern.~
+@1076 = ~Es wird Euch 5.000 Gold kosten und ohne meinen Lehrling müsst Ihr einen Tag bleiben und mir in der Schmiede helfen.~
+@1077 = ~Was würde das erfordern?~
+@1078 = ~Nein, daran bin ich nicht interessiert. Gibt es noch etwas anderes, das Ihr verwenden könnt?~
+@1079 = ~Nein, ich glaube nicht. Ich denke, ich werde jetzt gehen.~
+@1080 = ~Ja, klingt gut.~
+@1081 = ~Nun denn. Lasst mich sehen, was habt.~

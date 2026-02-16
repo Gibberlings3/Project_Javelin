@@ -1,0 +1,10 @@
+// this file to be stored as UTF8 and will NOT be converted to ANSI for non-EE games
+// this file only contains text used by the installer and not game strings
+
+@0 = ~Project Javelin (Projekt Wurfspiess)~
+// @1 is copied from Anthology, where it's @27
+@1 = ~Der DLC Merger wird benoetigt, bevor Mods installiert werden kann. Weitere Informationen und ein Downloadlink zum DLC Merger in der Readme.~
+// @2 is copied from Anthology, where it's @25
+@2 = ~Die Komponente steht fuer dieses Spiel nicht zur Verfuegung.~
+@3 = ~Diese Komponente benoetigt die Hauptkomponente.~
+@4 = ~Kensais und Rittern den Gebrauch von Wurfspiessen erlauben~ 

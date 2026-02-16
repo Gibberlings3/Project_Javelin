@@ -49,6 +49,13 @@ LANGUAGE
   ~en_us~
   ~cd_project_javelin/lang/en_us/game.tra~
   ~cd_project_javelin/lang/en_us/weidu.tra~
+LANGUAGE
+  ~German (translated by Jarl)~
+  ~de_de~
+  ~cd_project_javelin/lang/en_us/game.tra~
+  ~cd_project_javelin/lang/en_us/weidu.tra~
+  ~cd_project_javelin/lang/de_de/game.tra~
+  ~cd_project_javelin/lang/de_de/weidu.tra~
 
 /////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
 /////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\/////\\\\\
