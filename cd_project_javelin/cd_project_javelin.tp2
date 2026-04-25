@@ -83,15 +83,39 @@ ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3082~ BEGIN OUTER_SET jav_stack =  80
 ACTION_IF MOD_IS_INSTALLED ~cdtweaks.tp2~ ~3083~ BEGIN OUTER_SET jav_stack = 120 END ELSE 
                                                  BEGIN OUTER_SET jav_stack =  20 END      // otherwise just use 20
 
-// if a mod increases spear damage, use those as baseline - used in item descripts and set in base javelin so it propagates
-ACTION_IF ((MOD_IS_INSTALLED ~zstweaks.tp2~ ~1150~) OR 
-           (MOD_IS_INSTALLED ~zstweaks.tp2~ ~103~) OR
-           (MOD_IS_INSTALLED ~iwdification.tp2~ ~190~)) BEGIN // Make spears do a baseline damage of 1d8, not 1d6 
-  OUTER_SET melee_die  = 6
-  OUTER_SET ranged_die = 8
-END ELSE BEGIN  
-  OUTER_SET melee_die  = 4
-  OUTER_SET ranged_die = 6
+// set baseline data - override with actual sper01 check, below, but want failsafe values
+OUTER_SET ranged_die = 6 + (2 * game_is_iwdee) // 1d8+0 on iwdee, 1d6+0 otherwise
+OUTER_SET general_num = 1
+OUTER_SET general_bon = 0
+
+ACTION_IF ((MOD_IS_INSTALLED ~zstweaks.tp2~ ~1150~) OR    // kaelyn's tweak to increase spear damage
+           (MOD_IS_INSTALLED ~zstweaks.tp2~ ~103~)) BEGIN
+  OUTER_SET ranged_die += 2
+END 
+
+ACTION_IF (MOD_IS_INSTALLED ~iwdification.tp2~ ~190~) BEGIN // iwdification's tweak to increase spear damage
+  OUTER_SET ranged_die += 2
+END 
+
+COPY_EXISTING ~%tutu_var%sper01.itm~ ~override~ // read melee damage from regular spear
+  READ_LONG  0x64 abil_off
+  READ_SHORT 0x68 abil_num
+  READ_LONG  0x6a fx_off
+  FOR (index = 0 ; index < abil_num ; ++index) BEGIN // loop through abilities
+    READ_BYTE  (abil_off + 0x00 + (index * 0x38)) type
+    PATCH_IF type = 1 BEGIN // melee header
+      READ_BYTE  (abil_off + 0x16 + (index * 0x38)) ranged_die
+      READ_BYTE  (abil_off + 0x18 + (index * 0x38)) general_num
+      READ_BYTE  (abil_off + 0x1a + (index * 0x38)) general_bon
+      SET index = abil_num // kill loop
+    END   
+  END
+  BUT_ONLY
+  
+ACTION_IF general_num > 1 BEGIN
+  OUTER_SET melee_die = ranged_die - 1 // if multi-dice damage, reduce the melee die size by one, e.g. 2d4 to 2d3
+END ELSE BEGIN   
+  OUTER_SET melee_die = ranged_die - 2 // if single roll damage, reduce melee die by two, e.g 1d8 to 1d6
 END 
 
 /////                                                  \\\\\
@@ -135,34 +159,37 @@ END
 // basic +0 javelin, will be used as a base for other items
 LAF cd_spear_ancillary STR_VAR name = cdjav0 RET cdjav0_proj = proj END // copies BAMs, makes projectile, appends tooltip
 COPY ~cd_project_javelin/itm/cdjav0.itm~ ~override~
+  LPF cd_spear_edits INT_VAR weight = 3 price = 1 proj = cdjav0_proj STR_VAR name = EVAL ~%SOURCE_RES%~ cicon = csper01 RET general_plus END
   SAY 0x08 @1000
   SAY 0x0c @1000
   SAY 0x50 @1001
   WRITE_SHORT 0x38 jav_stack
-  LPF ALTER_HEADER INT_VAR match_type = 2 projectile = cdjav0_proj 
+  LPF ALTER_HEADER INT_VAR match_type = 2 dicesize = ranged_die dicenumber = general_num damage = general_bon
+    flag_strength = (1 - enhanced_edition) flag_str_damage = enhanced_edition END // use BIT0 on oBG2, BIT2 on EEs
+  LPF ALTER_HEADER INT_VAR match_type = 1 dicesize = melee_die dicenumber = general_num damage = general_bon
     flag_strength = (1 - enhanced_edition) flag_str_damage = enhanced_edition END // use BIT0 on oBG2, BIT2 on EEs
 
 // make high quality javelin from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav0q RET cdjav0q_proj = proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav0q.itm~
+  LPF cd_spear_edits INT_VAR weight = 3 price = 3 proj = cdjav0q_proj thac0_adj = 1 STR_VAR name = EVAL ~%SOURCE_RES%~ cicon = csper01 RET general_plus END
   SAY 0x08 @1014
   SAY 0x0c @1014
   SAY 0x50 @1015
-  LPF cd_spear_edits INT_VAR color1 = 15 color2 = 26 thac0_adj = 1 weight = 3 price = 5 proj = cdjav0q_proj STR_VAR name = EVAL ~%DEST_RES%~ END 
 
 // make javelin +1 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav1 RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1.itm~
+  LPF cd_spear_edits INT_VAR lore = 20 color1 = 67 color2 = 63 enchantment = 1 weight = 2 price = 10 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 RET general_plus END 
   SAY 0x0c @1002
   SAY 0x54 @1003
-  LPF cd_spear_edits INT_VAR lore = 20 color1 = 67 color2 = 63 enchantment = 1 weight = 2 price = 10 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
 
 // make burning Javelin +1 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav1b RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1b.itm~
+  LPF cd_spear_edits INT_VAR lore = 25 color1 = 80 color2 = 94 enchantment = 1 weight = 2 price = 25 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 RET general_plus END 
   SAY 0x0c @1019
   SAY 0x54 @1020
-  LPF cd_spear_edits INT_VAR lore = 25 color1 = 80 color2 = 94 enchantment = 1 weight = 2 price = 25 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
   // fire effects
   LPF ADD_ITEM_EQEFFECT INT_VAR opcode = 9 target = 2 parameter1 = (64 << 8) parameter2 = (21 + (20 << 16)) timing = 2 END // glowing spearhead (64 red 0 g/b)
   LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 12 target = 2 parameter2 = (8 << 16) resist_dispel = 1 timing = 1 savingthrow = BIT0 dicenumber = 1 dicesize = 4 END // 1d4 fire
@@ -173,9 +200,9 @@ COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1b.itm~
 // make Poisoned Javelin +1 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav1p RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1p.itm~
+  LPF cd_spear_edits INT_VAR lore = 30 color1 = 7 color2 = 5 enchantment = 1 weight = 2 price = 30 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 RET general_plus END 
   SAY 0x0c @1004
   SAY 0x54 @1005
-  LPF cd_spear_edits INT_VAR lore = 30 color1 = 7 color2 = 5 enchantment = 1 weight = 2 price = 30 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
   // now add poison effects
   LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode = 25 target = 2 parameter1 = 2 parameter2 = 2 resist_dispel = 2 duration = 10 savingthrow = BIT2 END // poison
   PATCH_IF enhanced_edition BEGIN 
@@ -189,16 +216,16 @@ COPY_EXISTING ~cdjav0.itm~ ~override/cdjav1p.itm~
 // make Returning Javelin +2 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav2 RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav2.itm~
+  LPF cd_spear_edits INT_VAR lore = 40 color1 = 68 color2 = 64 enchantment = 2 weight = 2 price = 2500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 RET general_plus END 
   SAY 0x0c @1006
   SAY 0x54 @1007
-  LPF cd_spear_edits INT_VAR lore = 40 color1 = 68 color2 = 64 enchantment = 2 weight = 2 price = 2500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
   
 // make iron elegy +2 from basic javelin
 LAF cd_spear_ancillary INT_VAR proj_spd = 30 STR_VAR name = cdjav2e RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav2e.itm~
+  LPF cd_spear_edits INT_VAR lore = 45 color1 = 79 color2 = 93 enchantment = 2 weight = 15 price = 5000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 RET general_plus END 
   SAY 0x0c @1016
   SAY 0x54 @1017
-  LPF cd_spear_edits INT_VAR lore = 45 color1 = 79 color2 = 93 enchantment = 2 weight = 15 price = 5000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper07 END 
   WRITE_SHORT 0x26 12 // min str
   // 10% silence on hit
   LPF ADD_ITEM_EFFECT INT_VAR type = 99 opcode =  38 target = 2 timing = 0 duration = 12 resist_dispel = 1 probability1 = 9 savingthrow = BIT0 END // silence
@@ -229,35 +256,37 @@ COPY_EXISTING ~cdjav0.itm~ ~override/cdjav2e.itm~
 // make Returning Javelin +3 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav3 RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav3.itm~
+  LPF cd_spear_edits INT_VAR lore = 50 color1 = 44 color2 = 22 enchantment = 3 weight = 2 price = 6000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 RET general_plus END 
   SAY 0x0c @1008
   SAY 0x54 @1009
-  LPF cd_spear_edits INT_VAR lore = 50 color1 = 44 color2 = 22 enchantment = 3 weight = 2 price = 6000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper02 END 
 
 // make Evergreen Javelin +3 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav3e RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav3e.itm~
+  LPF cd_spear_edits INT_VAR lore = 65 color1 = 7 color2 = 36 enchantment = 3 weight = 2 price = 9500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 RET general_plus END
   SAY 0x0c @1010
   SAY 0x54 @1011
-  LPF cd_spear_edits INT_VAR lore = 65 color1 = 7 color2 = 36 enchantment = 3 weight = 2 price = 9500 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 END
 
 // make Evergreen Javelin +4 from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav4e RET proj END // copies BAMs, makes projectile, appends tooltip
 COPY_EXISTING ~cdjav0.itm~ ~override/cdjav4e.itm~
+  LPF cd_spear_edits INT_VAR color1 = 52 color2 = 90 enchantment = 4 weight = 2 price = 17000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 RET general_plus END
   SAY 0x0c @1012
   SAY 0x54 @1013
-  LPF cd_spear_edits INT_VAR color1 = 52 color2 = 90 enchantment = 4 weight = 2 price = 17000 returning = 1 proj STR_VAR name = EVAL ~%DEST_RES%~ cicon = csper03 END
 
 // outerplanar damage for evergreen
 COPY ~cd_project_javelin/wav/cdjav3e.wav~  ~override~       // quad damage sound - not worth to convert for one file
 COPY ~cd_project_javelin/eff/cdjav3e.eff~  ~override~       // eff to play sound
 COPY ~cd_project_javelin/eff/cdjav3e0.eff~ ~override~       // +3 melee double
-  WRITE_LONG 0x3c melee_die   // base die size
+  WRITE_LONG 0x1c (general_bon + 3) // generic +x bonus
+  WRITE_LONG 0x38 general_num       // dice number
+  WRITE_LONG 0x3c melee_die         // base die size
 COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav3e2.eff~ // +3 ranged double
   WRITE_SHORT 0x22 128        // damage type: missile
   WRITE_LONG  0x3c ranged_die // base die size
 COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav4e0.eff~ // +4 melee double
               ~cdjav3e2.eff~ ~override/cdjav4e2.eff~ // +4 ranged double
-  WRITE_LONG 0x1c 4 // +3 > +4 fixed damage
+  WRITE_LONG 0x1c (general_bon + 4) // +3 > +4 fixed damage
 COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav3e1.eff~ // +3 melee quadruple
               ~cdjav3e2.eff~ ~override/cdjav3e3.eff~ // +3 melee quadruple
               ~cdjav4e0.eff~ ~override/cdjav4e1.eff~ // +4 melee quadruple
@@ -278,6 +307,21 @@ COPY_EXISTING ~cdjav3e.itm~ ~override~
     LPF ADD_ITEM_EFFECT INT_VAR type = 2 opcode = 177 target = 2 parameter1 = race parameter2 = 4 timing = 1 probability2 = (1 + prob) STR_VAR resource = EVAL ~%SOURCE_RES%2~ END // ranged double
   END  
   SET prob += 15
+
+/////                                                  \\\\\
+///// remove melee from stackable javelins             \\\\\
+/////                                                  \\\\\
+
+COPY_EXISTING ~cdjav0.itm~  ~override~ // unenchanted
+              ~cdjav0q.itm~ ~override~ // high-quality
+              ~cdjav1.itm~  ~override~ // +1
+              ~cdjav1b.itm~ ~override~ // +1 burning
+              ~cdjav1p.itm~ ~override~ // +1 poison
+  LPF DELETE_HEADER INT_VAR match_type = 1 END
+  
+COPY_EXISTING ~tooltip.2da~ ~override~
+  REPLACE_TEXTUALLY ~^cdjav[01][qbp]? .+[%LNL%%MNL%%WNL%]+~ ~~
+  PRETTY_PRINT_2DA
 
 /////                                                  \\\\\
 ///// item placement                                   \\\\\
@@ -330,7 +374,7 @@ ACTION_IF game_includes_bg1 BEGIN // bgee, eet, bgt, tutu
           
   
   END */
-    
+
 END 
 
 ACTION_IF game_includes_soa BEGIN // bg2ee, eet, bgt, obg2
@@ -530,9 +574,8 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.are$~ ~override~
 // bgee/bg2ee/eet PFNM already blocks spears, so use spear value to clone - use axes for everything else
 ACTION_IF game_is_bgee OR game_is_bg2ee OR game_is_eet BEGIN OUTER_SET projmatch = 55 END ELSE BEGIN OUTER_SET projmatch = 9 END
 COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
-  READ_ASCII 0x00 type (3)
   SET min_size = 0
-  PATCH_IF ("%type%" STRING_COMPARE_CASE "spl" = 0) BEGIN
+  PATCH_IF ("%SOURCE_EXT%" STRING_COMPARE_CASE "spl" = 0) BEGIN
     READ_LONG  0x64 abil_off ELSE 0
     READ_SHORT 0x68 abil_num ELSE 0
     READ_LONG  0x6a fx_off   ELSE 0
@@ -542,7 +585,7 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
     SET fx_type        = 0
     SET min_size       = 0x72
   END ELSE
-  PATCH_IF ("%type%" STRING_COMPARE_CASE "itm" = 0) BEGIN
+  PATCH_IF ("%SOURCE_EXT%" STRING_COMPARE_CASE "itm" = 0) BEGIN
     READ_LONG  0x64 abil_off ELSE 0
     READ_SHORT 0x68 abil_num ELSE 0
     READ_LONG  0x6a fx_off   ELSE 0
@@ -552,7 +595,7 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
     SET fx_type        = 0
     SET min_size       = 0x72
   END ELSE
-  PATCH_IF ("%type%" STRING_COMPARE_CASE "cre" = 0) BEGIN
+  PATCH_IF ("%SOURCE_EXT%" STRING_COMPARE_CASE "cre" = 0) BEGIN
     READ_LONG  0x2c4 fx_off ELSE 0
     READ_BYTE 0x33 fx_type ELSE 2
     SET abil_off       = 0
@@ -562,7 +605,7 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.\(cre\|itm\|spl\)$~ ~override~
     SET global_loop    = 1
     SET min_size       = 0x2d4
   END ELSE BEGIN
-    PATCH_PRINT ~Warning: PFNM update halting; file type not recognized (%type%)~
+    PATCH_PRINT ~Warning: PFNM update halting; file type not recognized (%SOURCE_EXT%)~
   END
   PATCH_IF ((SOURCE_SIZE >= min_size) AND (min_size != 0)) BEGIN // min_size must get set by file type detection
     SET new_fx = 0
@@ -620,5 +663,8 @@ REQUIRE_PREDICATE MOD_IS_INSTALLED ~cd_project_javelin.tp2~ ~1~ @3
 LABEL ~cd_project_javelin_kensais_cavaliers~
 
 COPY_EXISTING_REGEXP GLOB ~^cdjav.+\.itm$~ ~override~
-  WRITE_BYTE 0x2f (THIS BAND `(BIT2 + BIT3)) // removes cavalier, kensai flags
+  READ_SHORT 0x38 stack 
+  PATCH_IF stack <= 1 BEGIN // javelins which stack do not have melee abilities
+    WRITE_BYTE 0x2f (THIS BAND `(BIT2 + BIT3)) // removes cavalier, kensai flags
+  END  
   BUT_ONLY

@@ -2,12 +2,11 @@
 // for non-EE, strings in this file may be overridden by strings in orig.tra
 
 @1000 = ~Javelin~
-@1001 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1001 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin is a ranged weapon, intended to be thrown and cannot be used for melee combat.
 
 STATISTICS:
 
-Damage: 1d%ranged_die% (thrown, missile)
-Damage: 1d%melee_die% (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (missile)
 Speed Factor: 4
 Proficiency Type: Spear
 Type: One-handed
@@ -16,15 +15,14 @@ Requires:
 
 Weight: 3~
 @1002 = ~Javelin +1~
-@1003 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1003 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin is a ranged weapon, intended to be thrown and cannot be used for melee combat.
 
 This javelin has been enhanced magically. Runes can be seen glowing on every surface.
 
 STATISTICS:
 
 THAC0: +1
-Damage: 1d%ranged_die%+1 (thrown, missile)
-Damage: 1d%melee_die%+1 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (missile)
 Speed Factor: 3
 Proficiency Type: Spear
 Type: One-handed
@@ -33,7 +31,7 @@ Requires:
 
 Weight: 2~
 @1004 = ~Poisoned Javelin~
-@1005 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1005 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin is a ranged weapon, intended to be thrown and cannot be used for melee combat.
 
 A thin coating of poison has been applied to each spearhead.
 
@@ -43,8 +41,7 @@ Combat abilities:
 – Hit target must save vs. Death or suffer 2 points of poison damage per second for 10 seconds
 
 THAC0: +1
-Damage: 1d%ranged_die%+1 (thrown, missile)
-Damage: 1d%melee_die%+1 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (missile)
 Speed Factor: 3
 Proficiency Type: Spear
 Type: One-handed
@@ -53,7 +50,7 @@ Requires:
 
 Weight: 2~
 @1006 = ~Returning Javelin +2~
-@1007 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1007 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin has been magically reinforced and may be used in melee, though it does less damage.
 
 This particular weapon has been enhanced magically to complement the skill of the wielder.
 
@@ -63,8 +60,8 @@ Combat abilities:
 – Returns to the wielder's hand when thrown
 
 THAC0: +2
-Damage: 1d%ranged_die%+2 (thrown, missile)
-Damage: 1d%melee_die%+2 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (thrown, missile)
+Damage: %general_num%d%melee_die%%general_plus% (melee, piercing)
 Speed Factor: 2
 Proficiency Type: Spear
 Type: One-handed
@@ -73,7 +70,7 @@ Requires:
 
 Weight: 2~
 @1008 = ~Returning Javelin +3~
-@1009 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1009 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin has been magically reinforced and may be used in melee, though it does less damage.
 
 This javelin has been forged by hands both magical and highly skilled. Neither nick nor stain mar the flawless spearhead. When used in battle, the javelin radiates magic and gifts the wielder with increased skill.
 
@@ -83,8 +80,8 @@ Combat abilities:
 – Returns to the wielder's hand when thrown
 
 THAC0: +3
-Damage: 1d%ranged_die%+3 (thrown, missile)
-Damage: 1d%melee_die%+3 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (thrown, missile)
+Damage: %general_num%d%melee_die%%general_plus% (melee, piercing)
 Speed Factor: 1
 Proficiency Type: Spear
 Type: One-handed
@@ -96,7 +93,7 @@ Weight: 2~
 @1010 = ~Evergreen Lance +3~
 @1011 = ~The Evergreen Lance was originally designed to protect against outerplanar creature through an intense connection with the Prime Material Plane. Despite this lofty goal, the connection has faded through the ages as it has instead become a prized weapon in the endless and bloody succession fights of druidic orders across Faerûn. Tired of the endless disputes over the Evergreen Lance, the javelin was finally removed from the druidic infighting and reprisals by the Grand Druid herself. She demanded the lance as a tribute from one of her Archdruids, and then promptly fenced it so that none of the druids could trace the item.
 
-While the power has faded, the Evergreen Lance still retains some of its power to fight outerplanar creatures. 
+While the power has faded, the Evergreen Lance still retains some of its power to fight outerplanar creatures. It has also been magically reinforced and may be used in melee, though it does less damage.
 
 STATISTICS:
 
@@ -106,8 +103,8 @@ Combat abilities:
 – 5% chance of quadruple damage vs. outerplanar creatures instead of double
 
 THAC0: +3
-Damage: 1d%melee_die%+3 (melee, piercing)
-Damage: 1d%ranged_die%+3 (thrown, missile)
+Damage: %general_num%d%ranged_die%%general_plus% (thrown, missile)
+Damage: %general_num%d%melee_die%%general_plus% (melee, piercing)
 Speed Factor: 1
 Proficiency Type: Spear
 Type: One-handed
@@ -118,7 +115,7 @@ Weight: 2~
 @1012 = ~Evergreen Lance +4~
 @1013 = ~The Evergreen Lance was originally designed to protect against outerplanar creature through an intense connection with the Prime Material Plane. Despite this lofty goal, the connection has faded through the ages as it has instead become a prized weapon in the endless and bloody succession fights of druidic orders across Faerûn. Tired of the endless disputes over the Evergreen Lance, the javelin was finally removed from the druidic infighting and reprisals by the Grand Druid herself. She demanded the lance as a tribute from one of her Archdruids, and then promptly fenced it so that none of the druids could trace the item.
 
-You have managed to unlock more of the Evergreen Lance's power to fight outerplanar creatures. 
+You have managed to unlock more of the Evergreen Lance's power to fight outerplanar creatures. It has also been magically reinforced and may be used in melee, though it does less damage.
 
 STATISTICS:
 
@@ -128,8 +125,8 @@ Combat abilities:
 – 20% chance of quadruple damage vs. outerplanar creatures instead of double
 
 THAC0: +4
-Damage: 1d%melee_die%+4(melee, piercing)
-Damage: 1d%ranged_die%+4 (thrown, missile)
+Damage: %general_num%d%ranged_die%%general_plus% (thrown, missile)
+Damage: %general_num%d%melee_die%%general_plus% (melee, piercing)
 Speed Factor: 0
 Proficiency Type: Spear
 Type: One-handed
@@ -138,13 +135,12 @@ Requires:
 
 Weight: 2~
 @1014 = ~High Quality Javelin~
-@1015 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1015 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin is a ranged weapon, intended to be thrown and cannot be used for melee combat.
 
 STATISTICS:
 
 THAC0: +1
-Damage: 1d%ranged_die% (thrown, missile)
-Damage: 1d%melee_die% (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (missile)
 Speed Factor: 4
 Proficiency Type: Spear
 Type: One-handed
@@ -153,7 +149,7 @@ Requires:
 
 Weight: 3~
 @1016 = ~The Iron Elegy~
-@1017 = ~Javelins are typically light, flexible spears designed primarily as a throwing weapon. However the Iron Elegy weghs heavy in your hands due to its iron shaft and steel tip. 
+@1017 = ~Javelins are typically light, flexible spears designed primarily as a throwing weapon. However the Iron Elegy weghs heavy in your hands due to its iron shaft and steel tip. As a result it may be used in melee, though it does less damage.
 
 Mubark was a half-ogre who dwelled near the Forest of Tethir. After a dispute with a local cleric who tried to drive Mubark from the land, Mubark commissioned the Elegy to counter the cleric's magic and was able to defend his home from further incursions.
 
@@ -164,8 +160,8 @@ Combat abilities:
 – 10% chance that target is silenced for two rounds (Save vs. Spell negates)
 
 THAC0: +2
-Damage: 1d%ranged_die%+2 (thrown, missile)
-Damage: 1d%melee_die%+2 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (thrown, missile)
+Damage: %general_num%d%melee_die%%general_plus% (melee, piercing)
 Speed Factor: 2
 Proficiency Type: Spear
 Type: One-handed
@@ -175,7 +171,7 @@ Requires:
 Weight: 15~
 @1018 = ~Silence~
 @1019 = ~Javelin of Fire~
-@1020 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. The javelin is a ranged weapon, intended to be thrown. While javelins can be used for melee combat, they are not sturdy enough and perform poorly.
+@1020 = ~Javelins are light, flexible spears designed primarily as a throwing weapon. They are usually constructed of wood and tipped with a small metal spearhead. The shaft is much thinner than a two-handed spear. This javelin is a ranged weapon, intended to be thrown and cannot be used for melee combat.
 
 The javelin of fire is a magical javelin that will burst into flames as it is fired at an enemy. The effect is similar to a javelin doused in oil and set to flame.
 
@@ -185,8 +181,7 @@ Combat abilities:
 – Hit target must save vs. Spell or suffer 1d4 points of fire damage
 
 THAC0: +1
-Damage: 1d%ranged_die%+1 (thrown, missile)
-Damage: 1d%melee_die%+1 (melee, piercing)
+Damage: %general_num%d%ranged_die%%general_plus% (missile)
 Speed Factor: 3
 Proficiency Type: Spear
 Type: One-handed

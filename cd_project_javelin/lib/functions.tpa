@@ -4,6 +4,7 @@
 
 INCLUDE ~cd_project_javelin/lib/game_checks.tpa~       // sets various game_is vars
 INCLUDE ~cd_project_javelin/lib/alter_header.tpa~      // used to modify headers
+INCLUDE ~cd_project_javelin/lib/delete_header.tpa~     // used to delete headers
 INCLUDE ~cd_project_javelin/lib/g3_cpmvars_master.tpa~ // CPM for bg content
 INCLUDE ~cd_project_javelin/lib/cd_transfer_profs.tpa~ // prof comp for new weapons on creatures
 
@@ -49,6 +50,7 @@ DEFINE_PATCH_FUNCTION cd_spear_edits
           color2      = "-1" // grip/staff minor (20)
   STR_VAR name        = ""
           cicon       = csper01
+  RET     general_plus      
 BEGIN
   
   PATCH_IF enchantment > 0 BEGIN 
@@ -64,7 +66,7 @@ BEGIN
   WRITE_LONG 0x4c weight      // weight
   WRITE_LONG 0x60 enchantment // enchantment
   PATCH_IF enchantment > 3 BEGIN SET wspd = 0 END ELSE BEGIN SET wspd = (4 - enchantment) END 
-  LPF ALTER_HEADER INT_VAR to_hit = (enchantment + thac0_adj) damage = enchantment speed = wspd STR_VAR icon = EVAL ~%name%i~ END
+  LPF ALTER_HEADER INT_VAR to_hit = (enchantment + thac0_adj) damage = (enchantment + general_bon) speed = wspd STR_VAR icon = EVAL ~%name%i~ END
   LPF ALTER_HEADER INT_VAR match_type = 2 charges = (1 - returning) projectile = proj END // ranged projectile
   PATCH_IF color1 >= 0 BEGIN 
     LPF ALTER_EFFECT INT_VAR check_headers = 0 match_opcode = 7 match_parameter2 = 21 parameter1 = color1 END
@@ -72,5 +74,9 @@ BEGIN
   PATCH_IF color2 >= 0 BEGIN 
     LPF ALTER_EFFECT INT_VAR check_headers = 0 match_opcode = 7 match_parameter2 = 20 parameter1 = color2 END
   END  
+  SET dam_bonus = enchantment + general_bon
+  SPRINT general_plus ~~ // damage is xdy+0
+  PATCH_IF dam_bonus > 0 BEGIN SPRINT general_plus ~+%dam_bonus%~ END ELSE // damage is xdy+1 (or more)
+  PATCH_IF dam_bonus < 0 BEGIN SPRINT general_plus ~%dam_bonus%~ END      // damage is xdy-1 (or less)
           
 END 

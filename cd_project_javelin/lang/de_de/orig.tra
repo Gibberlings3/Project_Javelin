@@ -4,8 +4,7 @@
 
 EIGENSCHAFTEN:
 
-Schaden (Fernkampf): 1d%ranged_die% (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
 Initiativefaktor: 4
 Fertigkeit: Speer
 Typ: 1-händig
@@ -21,8 +20,7 @@ Kann nicht verwendet werden von:
 EIGENSCHAFTEN:
 
 ETW0-Bonus: -1
-Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
 Initiativefaktor: 3
 Fertigkeit: Speer
 Typ: 1-händig
@@ -42,8 +40,7 @@ EIGENSCHAFTEN:
 Bei einem Treffer erleidet das Ziel 2 Schadenspunkte durch Gift pro Sekunde für 10 Sekunden (Rettungswurf gg. Gift).
 
 ETW0-Bonus: -1
-Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
 Initiativefaktor: 3
 Fertigkeit: Speer
 Typ: 1-händig
@@ -63,8 +60,8 @@ EIGENSCHAFTEN:
 Kehrt sofort zum Werfer zurück.
 
 ETW0-Bonus: -2
-Schaden (Fernkampf): 1d%ranged_die% +2 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +2 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
+Schaden (Nahkampf): %general_num%d%melee_die%%general_plus% (Stich)
 Initiativefaktor: 2
 Fertigkeit: Speer
 Typ: 1-händig
@@ -84,8 +81,8 @@ EIGENSCHAFTEN:
 Kehrt sofort zum Werfer zurück.
 
 ETW0-Bonus: -3
-Schaden (Fernkampf): 1d%ranged_die% +3 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +3 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
+Schaden (Nahkampf): %general_num%d%melee_die%%general_plus% (Stich)
 Initiativefaktor: 1
 Fertigkeit: Speer
 Typ: 1-händig
@@ -108,10 +105,10 @@ Bei einem erfolgreichen Treffer gegen extraplanare Wesen besteht eine Chance von
 
 ETW0-Bonus: -3
 Schaden (Fernkampf): 
- 1d%ranged_die% +3 (Stich/Geschoss)
+ %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
  2d%ranged_die% gg. extraplanare Wesen
 Schaden (Nahkampf): 
- 1d%melee_die% +3 (Stich)
+ %general_num%d%melee_die%%general_plus% (Stich)
  2d%melee_die% +6 gg. extraplanare Wesen
 Initiativefaktor: 1
 Fertigkeit: Speer
@@ -135,10 +132,10 @@ Bei einem erfolgreichen Treffer gegen extraplanare Wesen besteht eine Chance von
 
 ETW0-Bonus: -4
 Schaden (Fernkampf): 
- 1d%ranged_die% +4 (Stich/Geschoss)
+ %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
  2d%ranged_die% +8 gg. extraplanare Wesen
 Schaden (Nahkampf): 
- 1d%melee_die% +4 (Stich)
+ %general_num%d%melee_die%%general_plus% (Stich)
  2d%melee_die% +8 gg. extraplanare Wesen
 Initiativefaktor: 0
 Fertigkeit: Speer
@@ -155,8 +152,7 @@ Kann nicht verwendet werden von:
 EIGENSCHAFTEN:
 
 ETW0-Bonus: -1
-Schaden (Fernkampf): 1d%ranged_die% (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
 Initiativefaktor: 4
 Fertigkeit: Speer
 Typ: 1-händig
@@ -178,8 +174,8 @@ Kehrt sofort zum Werfer zurück.
 Bei einem erfolgreichen Treffer besteht eine Chance von 10 %, dass „Stille“ auf das Ziel gewirkt wird (Rettungswurf gg. Zauber).
 
 ETW0-Bonus: -2
-Schaden (Fernkampf): 1d%ranged_die% +2 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +2 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
+Schaden (Nahkampf): %general_num%d%melee_die%%general_plus% (Stich)
 Initiativefaktor: 2
 Fertigkeit: Speer
 Typ: 1-händig
@@ -199,8 +195,7 @@ EIGENSCHAFTEN:
 Bei jedem Treffer erleidet das Ziel 1W2 Schadenspunkte durch Feuer (Rettungswurf gg. Zauber).
 
 ETW0-Bonus: -1
-Schaden (Fernkampf): 1d%ranged_die% +1 (Stich/Geschoss)
-Schaden (Nahkampf): 1d%melee_die% +1 (Stich)
+Schaden (Fernkampf): %general_num%d%ranged_die%%general_plus% (Stich/Geschoss)
 Initiativefaktor: 3
 Fertigkeit: Speer
 Typ: 1-händig
