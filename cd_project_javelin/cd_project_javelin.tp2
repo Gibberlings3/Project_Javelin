@@ -98,6 +98,12 @@ ACTION_IF (MOD_IS_INSTALLED ~iwdification.tp2~ ~190~) BEGIN // iwdification's tw
 END 
 
 COPY_EXISTING ~%tutu_var%sper01.itm~ ~override~ // read melee damage from regular spear
+  READ_LONG  0x1e sper01_use0
+  READ_BYTE  0x29 sper01_use1
+  READ_BYTE  0x2b sper01_use2
+  READ_BYTE  0x2d sper01_use3
+  READ_BYTE  0x2f sper01_use4
+  SET cdjav0_use4 = (sper01_use4 BOR (BIT2 + BIT3)) // add kensai/cav to base spear usability
   READ_LONG  0x64 abil_off
   READ_SHORT 0x68 abil_num
   READ_LONG  0x6a fx_off
@@ -158,16 +164,86 @@ END
 
 // basic +0 javelin, will be used as a base for other items
 LAF cd_spear_ancillary STR_VAR name = cdjav0 RET cdjav0_proj = proj END // copies BAMs, makes projectile, appends tooltip
-COPY ~cd_project_javelin/itm/cdjav0.itm~ ~override~
-  LPF cd_spear_edits INT_VAR weight = 3 price = 1 proj = cdjav0_proj STR_VAR name = EVAL ~%SOURCE_RES%~ cicon = csper01 RET general_plus END
-  SAY 0x08 @1000
-  SAY 0x0c @1000
-  SAY 0x50 @1001
-  WRITE_SHORT 0x38 jav_stack
-  LPF ALTER_HEADER INT_VAR match_type = 2 dicesize = ranged_die dicenumber = general_num damage = general_bon
-    flag_strength = (1 - enhanced_edition) flag_str_damage = enhanced_edition END // use BIT0 on oBG2, BIT2 on EEs
-  LPF ALTER_HEADER INT_VAR match_type = 1 dicesize = melee_die dicenumber = general_num damage = general_bon
-    flag_strength = (1 - enhanced_edition) flag_str_damage = enhanced_edition END // use BIT0 on oBG2, BIT2 on EEs
+CREATE ITM ~cdjav0~
+  // set string for use in description
+  SPRINT general_plus ~~ // damage is xdy+0
+  PATCH_IF general_bon > 0 BEGIN SPRINT general_plus ~+%general_bon%~ END ELSE // damage is xdy+1 (or more)
+  PATCH_IF general_bon < 0 BEGIN SPRINT general_plus ~%general_bon%~ END       // damage is xdy-1 (or less)
+  // item header
+  SAY          0x08 @1000                // unidentified name
+  SAY          0x0c @1000                // identified name
+  WRITE_ASCIIE 0x10 ~%tutu_var%misc56~   // broken item
+  WRITE_LONG   0x18 (BIT2 + BIT3 + BIT5) // droppable, displayable, not copyable
+  WRITE_SHORT  0x1c 29                   // type: spear
+  WRITE_LONG   0x1e sper01_use0          // copy usabiity from base spear
+  WRITE_ASCII  0x22 SP                   // equipped appearance
+  WRITE_SHORT  0x26 5                    // min str
+  WRITE_BYTE   0x29 sper01_use1          // copy usability from base spear
+  WRITE_BYTE   0x2b sper01_use2          // copy usability from base spear
+  WRITE_BYTE   0x2d sper01_use3          // copy usability from base spear
+  WRITE_BYTE   0x2f cdjav0_use4          // base spear + kensai/cav
+  WRITE_BYTE   0x31 98                   // prof: spear
+  WRITE_LONG   0x34 1                    // price
+  WRITE_SHORT  0x38 jav_stack            // stack size
+  WRITE_ASCII  0x3a cdjav0i              // icon
+  WRITE_ASCIIE 0x44 ~%tutu_var%gsper01~  // ground icon
+  WRITE_LONG   0x4c 3                    // weight
+  SAY          0x50 @1001                // unidentified description
+  SAY          0x54 @1001                // identified description
+  WRITE_ASCII  0x58 csper01              // descripiton art
+  WRITE_LONG   0x64 0x72                 // abilities offset
+  WRITE_SHORT  0x68 2                    // num abilities
+  WRITE_LONG   0x6a 0xe2                 // fx offset
+  WRITE_SHORT  0x70 2                    // num global fx
+  INSERT_BYTES 0x72 ((2 * 0x38) + (2 * 0x30)) // insert enough bytes for two abilities, two effects
+  // ranged ability
+  WRITE_BYTE  (0x72 + 0x00) 2           // type: ranged
+  WRITE_SHORT (0x72 + 0x02) 1           // location: weapon
+  WRITE_ASCII (0x72 + 0x04) cdjav0i     // icon
+  WRITE_BYTE  (0x72 + 0x0c) 1           // target: living actor
+  WRITE_SHORT (0x72 + 0x0e) 30          // range
+  WRITE_BYTE  (0x72 + 0x12) 4           // weapon speed
+  WRITE_BYTE  (0x72 + 0x16) ranged_die  // die size
+  WRITE_BYTE  (0x72 + 0x18) general_num // die number
+  WRITE_SHORT (0x72 + 0x1a) general_bon // damage bonus
+  WRITE_SHORT (0x72 + 0x1c) 4           // damage type: missile
+  WRITE_SHORT (0x72 + 0x20) 2           // fx index
+  WRITE_SHORT (0x72 + 0x22) 1           // charges
+  WRITE_SHORT (0x72 + 0x24) 1           // vanishes when charges expended
+  WRITE_LONG  (0x72 + 0x26) (((1 - enhanced_edition) * BIT0) + ((enhanced_edition) * BIT2)) // strength bonus: bit0 for obg2, bit2 for ees
+  WRITE_SHORT (0x72 + 0x2a) cdjav0_proj // projectile
+  WRITE_SHORT (0x72 + 0x2c) 100         // 100% overhand animation
+  // melee ability - this gets deleted for this specific item later, but needed since this item is used as a template for all others
+  WRITE_BYTE  (0xaa + 0x00) 1           // type: melee
+  WRITE_SHORT (0xaa + 0x02) 1           // location: weapon
+  WRITE_ASCII (0xaa + 0x04) cdjav0i     // icon
+  WRITE_BYTE  (0xaa + 0x0c) 1           // target: living actor
+  WRITE_SHORT (0xaa + 0x0e) 1           // range
+  WRITE_BYTE  (0xaa + 0x12) 4           // weapon speed
+  WRITE_BYTE  (0xaa + 0x16) melee_die   // die size
+  WRITE_BYTE  (0xaa + 0x18) general_num // die number
+  WRITE_SHORT (0xaa + 0x1a) general_bon // damage bonus
+  WRITE_SHORT (0xaa + 0x1c) 1           // damage type: piercing
+  WRITE_SHORT (0xaa + 0x20) 2           // fx index
+  WRITE_SHORT (0xaa + 0x22) 0           // charges
+  WRITE_SHORT (0xaa + 0x24) 1           // vanishes when charges expended
+  WRITE_LONG  (0xaa + 0x26) BIT0        // strength bonus
+  WRITE_SHORT (0xaa + 0x2a) 1           // no projectile
+  WRITE_SHORT (0xaa + 0x30) 100         // 100% thrust animation
+  // color opcode #1
+  WRITE_SHORT (0xe2 + 0x00) 7   // opcode: set color
+  WRITE_BYTE  (0xe2 + 0x02) 1   // target: self
+  WRITE_LONG  (0xe2 + 0x04) 4   // color: auburn
+  WRITE_LONG  (0xe2 + 0x08) 20  // location: grip/staff minor
+  WRITE_BYTE  (0xe2 + 0x0c) 2   // timing: while equipped
+  WRITE_BYTE  (0xe2 + 0x12) 100 // probability 1
+  // color opcode #2
+  WRITE_SHORT (0x112 + 0x00) 7   // opcode: set color
+  WRITE_BYTE  (0x112 + 0x02) 1   // target: self
+  WRITE_LONG  (0x112 + 0x04) 79  // color: light silver
+  WRITE_LONG  (0x112 + 0x08) 21  // location: head/blade minor
+  WRITE_BYTE  (0x112 + 0x0c) 2   // timing: while equipped
+  WRITE_BYTE  (0x112 + 0x12) 100 // probability 1
 
 // make high quality javelin from basic javelin
 LAF cd_spear_ancillary STR_VAR name = cdjav0q RET cdjav0q_proj = proj END // copies BAMs, makes projectile, appends tooltip
@@ -276,11 +352,24 @@ COPY_EXISTING ~cdjav0.itm~ ~override/cdjav4e.itm~
 
 // outerplanar damage for evergreen
 COPY ~cd_project_javelin/wav/cdjav3e.wav~  ~override~       // quad damage sound - not worth to convert for one file
-COPY ~cd_project_javelin/eff/cdjav3e.eff~  ~override~       // eff to play sound
-COPY ~cd_project_javelin/eff/cdjav3e0.eff~ ~override~       // +3 melee double
-  WRITE_LONG 0x1c (general_bon + 3) // generic +x bonus
-  WRITE_LONG 0x38 general_num       // dice number
-  WRITE_LONG 0x3c melee_die         // base die size
+
+CREATE EFF ~cdjav3e~ // eff to play sound
+  WRITE_LONG  0x10 174     // opcode: play sound
+  WRITE_LONG  0x14 1       // target: self
+  WRITE_LONG  0x24 1       // timing: perm
+  WRITE_SHORT 0x2c 100     // probability 1
+  WRITE_ASCII 0x30 cdjav3e // file
+  WRITE_LONG  0xa4 "-1"    // source item slot: none
+  
+COPY_EXISTING ~cdjav3e.eff~ ~override/cdjav3e0.eff~ // +3 melee double
+  WRITE_LONG  0x10 12                // opcode: damage
+  WRITE_LONG  0x14 2                 // target: preset target
+  WRITE_LONG  0x1c (general_bon + 3) // generic +x bonus
+  WRITE_SHORT 0x22 16                // damage type: piercing
+  WRITE_LONG  0x38 general_num       // dice number
+  WRITE_LONG  0x3c melee_die         // base die size
+  WRITE_ASCII 0x30 ~~ #8             // blank file
+  
 COPY_EXISTING ~cdjav3e0.eff~ ~override/cdjav3e2.eff~ // +3 ranged double
   WRITE_SHORT 0x22 128        // damage type: missile
   WRITE_LONG  0x3c ranged_die // base die size
