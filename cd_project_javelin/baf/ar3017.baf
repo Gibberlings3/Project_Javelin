@@ -1,0 +1,9 @@
+IF
+  Global("cd_placed_javelin","AR3017",0)
+THEN
+  RESPONSE #100
+    GiveItemCreate("cdjav0","Container14",%wk_stack%,0,0)
+    GiveItemCreate("cdjav0","Container14",%wk_stack%,0,0)
+    SetGlobal("cd_placed_javelin","AR3017",1)
+END
+

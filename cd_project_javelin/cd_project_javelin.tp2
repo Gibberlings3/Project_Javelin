@@ -488,6 +488,10 @@ ACTION_IF game_includes_soa BEGIN // bg2ee, eet, bgt, obg2
     COMPILE ~cd_project_javelin/dlg/cespenar.d~ // upgrade evergreen +3 to +4 [cespenar]
     EXTEND_BOTTOM ~botsmith.bcs~ ~cd_project_javelin/baf/botsmith.baf~
 
+    // force placement of generic javelins in WK (magic golems)
+    ACTION_IF jav_stack > 40 THEN BEGIN OUTER_SET wk_stack = 40 END ELSE BEGIN OUTER_SET wk_stack = jav_stack END 
+    EXTEND_BOTTOM ~ar3017.bcs~ ~cd_project_javelin/baf/ar3017.baf~ EVALUATE_BUFFER
+
   END
   
 END 
@@ -582,55 +586,59 @@ COPY_EXISTING_REGEXP GLOB ~^.+\.are$~ ~override~
     SET jav1p = 0
     SET local_delta = 0
     CLEAR_ARRAY cd_new_javs
+    READ_ASCII (cont_off + 0x00 + (index * 0xc0)) cont_name (32) NULL 
     WRITE_LONG (cont_off + 0x40 + (index * 0xc0)) (THIS + item_delta) // update index if we've inserted items
     READ_LONG (cont_off + 0x40 + (index * 0xc0)) item_idx
     READ_LONG (cont_off + 0x44 + (index * 0xc0)) item_num
-    FOR (index2 = item_idx ; index2 < (item_idx + item_num) ; ++index2) BEGIN
-      READ_ASCII (item_off + 0x00 + (index2 * 0x14)) item
-      PATCH_IF  (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]05$" = 0) OR  // throwing dagger 
-                 ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Xx]1[Hh]04$" = 0)) BEGIN // throwing axe
-        SET check = RANDOM (1 100)
-        PATCH_IF check <= (2 * base_chance) BEGIN 
-          SET check = RANDOM (1 20)
-          PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
-          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
-        END   
-      END ELSE         
-      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]01$" = 0) OR     // generic arrow 
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]01$" = 0) OR     // generic bolt
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]01$" = 0)) BEGIN // generic bullet
-        SET check = RANDOM (1 100)
-        PATCH_IF check <= base_chance BEGIN 
-          SET check = RANDOM (1 20)
-          PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
-          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
-        END   
-      END ELSE             
-      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]02$" = 0) OR     // +1 arrow 
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]02$" = 0) OR     // +1 bolt
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]03$" = 0)) BEGIN // +1 bullet
-        SET check = RANDOM (1 100)
-        PATCH_IF check <= base_chance BEGIN 
-          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav0~ END 
-        END   
-      END ELSE         
-      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]16$" = 0) OR      // poisoned throwing daggers
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]05$" = 0) OR      // arrow of biting
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]04$" = 0) OR      // bolt of biting
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Rr][Tt]05$$" = 0)) BEGIN // asp's nest
-        SET check = RANDOM (1 100)
-        PATCH_IF check <= base_chance BEGIN 
-          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1p~ END 
-        END   
-      END ELSE          
-      PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]08$" = 0) OR        // arrow of fire
-                ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]0[47]$" = 0)) BEGIN // sunstone/fire bullet
-        SET check = RANDOM (1 100)
-        PATCH_IF check <= base_chance BEGIN 
-          DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1b~ END 
-        END   
-      END
-    END // done looking through items
+    PATCH_IF (("%cont_name%" STRING_COMPARE_CASE "Container 14") OR  
+              ("%SOURCE_RES%" STRING_COMPARE_CASE "ar3017")) BEGIN // skip WK container 14
+      FOR (index2 = item_idx ; index2 < (item_idx + item_num) ; ++index2) BEGIN
+        READ_ASCII (item_off + 0x00 + (index2 * 0x14)) item
+        PATCH_IF  (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]05$" = 0) OR  // throwing dagger 
+                   ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Xx]1[Hh]04$" = 0)) BEGIN // throwing axe
+          SET check = RANDOM (1 100)
+          PATCH_IF check <= (2 * base_chance) BEGIN 
+            SET check = RANDOM (1 20)
+            PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
+            DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
+          END   
+        END ELSE         
+        PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]01$" = 0) OR     // generic arrow 
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]01$" = 0) OR     // generic bolt
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]01$" = 0)) BEGIN // generic bullet
+          SET check = RANDOM (1 100)
+          PATCH_IF check <= base_chance BEGIN 
+            SET check = RANDOM (1 20)
+            PATCH_IF check = 20 BEGIN SPRINT nitem cdjav0q END ELSE BEGIN SPRINT nitem cdjav0 END
+            DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~%nitem%~ END 
+          END   
+        END ELSE             
+        PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]02$" = 0) OR     // +1 arrow 
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]02$" = 0) OR     // +1 bolt
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]03$" = 0)) BEGIN // +1 bullet
+          SET check = RANDOM (1 100)
+          PATCH_IF check <= base_chance BEGIN 
+            DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav0~ END 
+          END   
+        END ELSE         
+        PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Gg][Gg]16$" = 0) OR      // poisoned throwing daggers
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]05$" = 0) OR      // arrow of biting
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Oo][Ll][Tt]04$" = 0) OR      // bolt of biting
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Dd][Aa][Rr][Tt]05$$" = 0)) BEGIN // asp's nest
+          SET check = RANDOM (1 100)
+          PATCH_IF check <= base_chance BEGIN 
+            DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1p~ END 
+          END   
+        END ELSE          
+        PATCH_IF (("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Aa][Rr][Oo][Ww]08$" = 0) OR        // arrow of fire
+                  ("%item%" STRING_COMPARE_REGEXP "^%tutu_var%[Bb][Uu][Ll][Ll]0[47]$" = 0)) BEGIN // sunstone/fire bullet
+          SET check = RANDOM (1 100)
+          PATCH_IF check <= base_chance BEGIN 
+            DEFINE_ASSOCIATIVE_ARRAY cd_new_javs BEGIN ~%index2%~ => ~cdjav1b~ END 
+          END   
+        END
+      END // done looking through items
+    END // wk check  
     PATCH_PHP_EACH cd_new_javs AS idx => nitem BEGIN
       //PATCH_PRINT ~ array: %nitem%, %idx% on %SOURCE_FILE%, container %index%~
       READ_ASCII   (item_off + 0x00 + ((idx + local_delta) * 0x14)) template (20)
